@@ -1,7 +1,10 @@
 {
   "name": "Sancadia",
   "image": "mcr.microsoft.com/devcontainers/typescript-node:1-22-bookworm",
-  "forwardPorts": [5173],
+  "features": {
+    "ghcr.io/devcontainers/features/docker-in-docker:2": {}
+  },
+  "forwardPorts":,
   "postCreateCommand": "npm ci",
   "customizations": {
     "vscode": {
