@@ -31,7 +31,7 @@ export default function GameScreen() {
   if (GameComponent) {
     return (
       <div className="flex flex-1 flex-col">
-        <ScreenHeader title={game.name} />
+        {game.id !== 'latrunculi' && <ScreenHeader title={game.name} />}
         <Suspense fallback={<p role="status">Loading game…</p>}>
           <GameComponent />
         </Suspense>

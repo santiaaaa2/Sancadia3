@@ -93,6 +93,9 @@ export function requestMove<State, Move>(
 
   const activeWorker = getWorker();
   if (!activeWorker) {
+    if (gameId === 'latrunculi') {
+      return Promise.reject(new Error('LATRUNCULI requires Web Worker support for AI searches.'));
+    }
     try {
       const move = entry.findMove(state, difficulty);
       if (move !== null && !entry.isLegalMove(state, move)) {

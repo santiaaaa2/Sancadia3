@@ -26,6 +26,19 @@ export default function MatchSetup({ onStart }: { onStart: (config: MatchConfig)
   const { settings } = useSettings();
   const { gameId } = useParams();
   const gameName = games.find((game) => game.id === gameId)?.name;
+  const localBattle = gameId === 'latrunculi';
+  const localModeLabel = localBattle ? 'LOCAL BATTLE' : '2 Players';
+  const gameDifficultyOptions = localBattle
+    ? difficultyOptions.map((option) => ({
+        ...option,
+        label:
+          option.value === 'beginner'
+            ? 'Recruit'
+            : option.value === 'professional'
+              ? 'Centurion'
+              : 'General',
+      }))
+    : difficultyOptions;
   const [opponent, setOpponent] = useState<Opponent>('computer');
   const [order, setOrder] = useState<Order>('first');
   const [difficulty, setDifficulty] = useState(settings.difficulty);
@@ -42,8 +55,10 @@ export default function MatchSetup({ onStart }: { onStart: (config: MatchConfig)
   const onGoLive = () => setOnlineMessage('Online play coming soon');
   const startDescription =
     opponent === 'computer'
-      ? `Vs Computer mode. ${difficultyOptions.find((option) => option.value === difficulty)?.label ?? difficulty} difficulty. You go ${order === 'first' ? 'first' : 'second'}.`
-      : `2 Players mode. Computer difficulty ${difficultyOptions.find((option) => option.value === difficulty)?.label ?? difficulty} is selected but not used in 2 Players mode.`;
+      ? `Vs Computer mode. ${gameDifficultyOptions.find((option) => option.value === difficulty)?.label ?? difficulty} difficulty. You go ${order === 'first' ? 'first' : 'second'}.`
+      : localBattle
+        ? 'LOCAL BATTLE: Player 1 commands the Red Army and Player 2 commands the Blue Army. Take turns on the same device.'
+        : `2 Players mode. Computer difficulty ${difficultyOptions.find((option) => option.value === difficulty)?.label ?? difficulty} is selected but not used in 2 Players mode.`;
 
   return (
     <GamePreStart
@@ -59,7 +74,9 @@ export default function MatchSetup({ onStart }: { onStart: (config: MatchConfig)
         </p>
         <SegmentedControl
           label="Players"
-          options={opponentOptions}
+          options={opponentOptions.map((option) =>
+            option.value === 'two-player' ? { ...option, label: localModeLabel } : option,
+          )}
           value={opponent}
           onChange={setOpponent}
         />
@@ -95,7 +112,7 @@ export default function MatchSetup({ onStart }: { onStart: (config: MatchConfig)
             </p>
             <SegmentedControl
               label="Computer difficulty"
-              options={difficultyOptions}
+              options={gameDifficultyOptions}
               value={difficulty}
               onChange={setDifficulty}
             />

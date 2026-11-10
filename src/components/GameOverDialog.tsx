@@ -5,6 +5,15 @@ import Dialog from '@/components/Dialog';
 
 export type GameOutcome = 'win' | 'lose' | 'draw';
 
+export interface VictoryPresentation {
+  title: string;
+  subtitle: string;
+  winner: string;
+  finalPieces: readonly [number, number];
+  totalMoves: number;
+  armyNames: readonly [string, string];
+}
+
 interface GameOverDialogProps {
   open: boolean;
   outcome: GameOutcome;
@@ -12,6 +21,9 @@ interface GameOverDialogProps {
   message: string;
   pointsEarned?: number;
   pointsBreakdown?: Array<{ label: string; points: number }>;
+  victoryPresentation?: VictoryPresentation;
+  playAgainLabel?: string;
+  backToMenuLabel?: string;
   onPlayAgain: () => void;
   onBackToMenu: () => void;
   onClose: () => void;
@@ -32,6 +44,9 @@ export default function GameOverDialog({
   message,
   pointsEarned,
   pointsBreakdown,
+  victoryPresentation,
+  playAgainLabel = 'Play again',
+  backToMenuLabel = 'Back to menu',
   onPlayAgain,
   onBackToMenu,
   onClose,
@@ -42,16 +57,39 @@ export default function GameOverDialog({
     <Dialog
       open={open}
       onClose={onClose}
-      title={headline}
-      description={message}
+      title={victoryPresentation?.title ?? headline}
+      description={victoryPresentation?.subtitle ?? message}
       icon={
         <span
-          className={`flex h-14 w-14 items-center justify-center rounded-2xl ${tones[outcome]}`}
+          className={`flex h-14 w-14 items-center justify-center rounded-2xl ${
+            victoryPresentation ? 'latrunculi-victory-icon' : tones[outcome]
+          }`}
         >
           <Icon className="h-7 w-7" aria-hidden="true" />
         </span>
       }
     >
+      {victoryPresentation && (
+        <section
+          aria-label="Final battle result"
+          className="latrunculi-victory-details grid gap-2 rounded-xl p-4 text-sm"
+        >
+          <p>
+            <span className="font-semibold">Winner:</span> {victoryPresentation.winner}
+          </p>
+          {([0, 1] as const).map((player) => (
+            <p key={victoryPresentation.armyNames[player]}>
+              <span className="font-semibold">
+                {victoryPresentation.armyNames[player]} remaining:
+              </span>{' '}
+              {victoryPresentation.finalPieces[player]}
+            </p>
+          ))}
+          <p>
+            <span className="font-semibold">Total moves:</span> {victoryPresentation.totalMoves}
+          </p>
+        </section>
+      )}
       {pointsEarned !== undefined && (
         <div className="mb-4 text-center">
           <p className="text-lg font-bold text-primary">+{pointsEarned} points</p>
@@ -68,9 +106,9 @@ export default function GameOverDialog({
         </div>
       )}
       <div className="grid gap-3">
-        <Button onClick={onPlayAgain}>Play again</Button>
+        <Button onClick={onPlayAgain}>{playAgainLabel}</Button>
         <Button variant="secondary" onClick={onBackToMenu}>
-          Back to menu
+          {backToMenuLabel}
         </Button>
       </div>
     </Dialog>

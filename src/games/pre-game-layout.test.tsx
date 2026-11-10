@@ -12,7 +12,6 @@ const gamesWithSetup = new Set([
   'connect-4',
   'gomoku',
   'reversi',
-  'latrunculi',
   'checkers',
   'battleships',
   'mastermind',
@@ -46,7 +45,9 @@ describe('shared game pre-start layout', () => {
     'places Start, setup options, and links in order for every available game at %ipx',
     async (width) => {
       Object.defineProperty(window, 'innerWidth', { configurable: true, value: width });
-      for (const game of games.filter((entry) => entry.status === 'available' && gamesWithSetup.has(entry.id))) {
+      for (const game of games.filter(
+        (entry) => entry.status === 'available' && gamesWithSetup.has(entry.id),
+      )) {
         const view = renderGame(game.id);
         const start = await screen.findByRole('button', { name: 'Start game' });
         const setup = screen.getByTestId('game-setup-card');

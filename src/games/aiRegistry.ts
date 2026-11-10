@@ -13,7 +13,10 @@ import { evaluate as evaluateCheckers } from '@/games/checkers/ai';
 import { checkers, type CheckersState } from '@/games/checkers/rules';
 import { evaluate as evaluateReversi } from '@/games/reversi/ai';
 import { reversi, type ReversiState } from '@/games/reversi/rules';
-import { evaluate as evaluateLatrunculi } from '@/games/latrunculi/ai';
+import {
+  chooseMove as chooseLatrunculiMove,
+  evaluate as evaluateLatrunculi,
+} from '@/games/latrunculi/ai';
 import { latrunculi, MAX_MOVES, type LatrunculiState } from '@/games/latrunculi/rules';
 import { ticTacToe, type TicTacToeState } from '@/games/tictactoe/rules';
 
@@ -138,6 +141,7 @@ function createEntry<State, Move>(
   depthCaps: DifficultyCaps,
   validate: (state: unknown) => state is State,
   evaluate?: (state: State, player: Player) => number,
+  chooseMove?: (state: State, difficulty: Difficulty) => Move | null,
 ): WorkerAiEntry {
   const evaluateUnknown = evaluate
     ? (state: unknown, player: Player) => (validate(state) ? evaluate(state, player) : 0)
@@ -149,6 +153,7 @@ function createEntry<State, Move>(
     evaluate: evaluateUnknown,
     findMove(state, difficulty) {
       if (!validate(state)) throw new Error(`Invalid state for ${engine.id}`);
+      if (chooseMove) return chooseMove(state, difficulty);
       return pickAiMove(engine, state, getDifficultySettings(difficulty, depthCaps), evaluate);
     },
     isLegalMove(state, candidate) {
@@ -184,7 +189,7 @@ const CHECKERS_CAPS: DifficultyCaps = {
   timeLimitMs: 1500,
 };
 const LATRUNCULI_CAPS: DifficultyCaps = {
-  maxDepthCap: { beginner: 1, professional: 2, expert: 3 },
+  maxDepthCap: { beginner: 1, professional: 2, expert: 4 },
   timeLimitMs: 1200,
 };
 
@@ -194,7 +199,13 @@ export const aiRegistry: Record<WorkerGameId, WorkerAiEntry> = {
   gomoku: createEntry(gomoku, GOMOKU_CAPS, isGomokuState, evaluateGomoku),
   reversi: createEntry(reversi, REVERSI_CAPS, isReversiState, evaluateReversi),
   checkers: createEntry(checkers, CHECKERS_CAPS, isCheckersState, evaluateCheckers),
-  latrunculi: createEntry(latrunculi, LATRUNCULI_CAPS, isLatrunculiState, evaluateLatrunculi),
+  latrunculi: createEntry(
+    latrunculi,
+    LATRUNCULI_CAPS,
+    isLatrunculiState,
+    evaluateLatrunculi,
+    chooseLatrunculiMove,
+  ),
 };
 
 export function isWorkerGameId(value: string): value is WorkerGameId {

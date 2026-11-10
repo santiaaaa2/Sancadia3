@@ -172,6 +172,8 @@ function resolveMoveResult(state: LatrunculiState): LatrunculiState {
   if (state.victoryRules.noPieces && first === 0) return completed(state, 1);
   if (state.victoryRules.noPieces && second === 0) return completed(state, 0);
 
+  if (state.totalMoves >= MAX_MOVES) return completed(state, 'draw');
+
   if (state.victoryRules.majorityCapture && state.capturedPieces[0] > INITIAL_ARMY_SIZE / 2) {
     return completed(state, 0);
   }
@@ -180,22 +182,26 @@ function resolveMoveResult(state: LatrunculiState): LatrunculiState {
   }
 
   const currentMoves = legalMovesFor(state);
-  const opponentMoves = legalMovesFor({ ...state, turn: otherPlayer(state.turn) });
-  if (currentMoves.length === 0) {
-    if (state.victoryRules.noLegalMoves && opponentMoves.length > 0) {
-      return completed(state, otherPlayer(state.turn));
-    }
-    if (opponentMoves.length === 0 || !state.victoryRules.noLegalMoves) {
-      return completed(state, 'draw');
-    }
+  if (currentMoves.length === 0 && state.victoryRules.noLegalMoves) {
+    return completed(state, otherPlayer(state.turn));
   }
 
-  if (state.totalMoves >= MAX_MOVES) return completed(state, 'draw');
   return state;
 }
 
 function winnerOf(state: LatrunculiState): Winner {
-  return state.status === 'completed' ? state.winner : null;
+  if (state.status === 'completed') return state.winner;
+  if (state.victoryRules.noPieces) {
+    const [first, second] = pieceCounts(state.board);
+    if (first === 0 && second === 0) return 'draw';
+    if (first === 0) return 1;
+    if (second === 0) return 0;
+  }
+  if (state.totalMoves >= MAX_MOVES) return 'draw';
+  if (state.victoryRules.noLegalMoves && legalMovesFor(state).length === 0) {
+    return otherPlayer(state.turn);
+  }
+  return null;
 }
 
 export function resignGame(state: LatrunculiState, player: Player = state.turn): LatrunculiState {

@@ -25,6 +25,15 @@ uniform across antiquity.
 - Victory rules are stored in the game state so future variants can change them. Majority-capture
   victory is disabled in the default rules and is never inferred from capture totals.
 
+## Computer opponent
+
+The computer offers three strengths: Recruit (one-ply tactical play), Centurion (two-ply response
+search), and General (deeper minimax with alpha-beta pruning, bounded by a search time limit).
+Evaluation considers material, immediate custodial captures and threats, mobility, central control,
+and orthogonal friendly formations. Search candidates and resulting moves come from the same
+validated rules engine as human moves. Computer searches run in a Web Worker; a 700 ms presentation
+delay gives the thinking indicator time to appear without blocking the interface.
+
 ## Capture implementation
 
 Capture rules live separately from legal movement in `src/games/latrunculi/capture.ts`.

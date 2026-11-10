@@ -14,6 +14,7 @@ interface EngineMatchOptions<State, Move> {
   chooseMove: (state: State, difficulty: Difficulty) => Move | null;
   enableUndo?: boolean;
   initialState?: () => State;
+  thinkingDelayMs?: number;
 }
 
 export function useEngineMatch<State, Move>({
@@ -22,6 +23,7 @@ export function useEngineMatch<State, Move>({
   chooseMove,
   enableUndo = false,
   initialState = engine.initialState,
+  thinkingDelayMs,
 }: EngineMatchOptions<State, Move>) {
   const { place, win, lose, draw } = useFeedback();
   const { recordResult } = useStats();
@@ -39,6 +41,7 @@ export function useEngineMatch<State, Move>({
   const [scores, setScores] = useState<MatchScores>(NO_SCORES);
   const [dialogOpen, setDialogOpen] = useState(false);
   const [pointsEarned, setPointsEarned] = useState(0);
+  const [aiError, setAiError] = useState<string | null>(null);
 
   const result = engine.winner(state);
   const over = result !== null;
@@ -95,36 +98,36 @@ export function useEngineMatch<State, Move>({
     if (!computerTurn || difficulty === null) return;
     let active = true;
     const controller = new AbortController();
-    const timer = window.setTimeout(
-      () => {
-        const search = isWorkerGameId(engine.id)
-          ? requestMove<State, Move>(engine.id, state, difficulty, controller.signal)
-          : Promise.resolve(chooseMove(state, difficulty));
+    const delay = thinkingDelayMs ?? 400 + Math.random() * 400;
+    const timer = window.setTimeout(() => {
+      const search = isWorkerGameId(engine.id)
+        ? requestMove<State, Move>(engine.id, state, difficulty, controller.signal)
+        : Promise.resolve(chooseMove(state, difficulty));
 
-        void search
-          .then((move) => {
-            if (!active || move === null) return;
-            const legal = engine
-              .legalMoves(state)
-              .some(
-                (candidate) => engine.movesEqual?.(candidate, move) ?? Object.is(candidate, move),
-              );
-            if (!legal) throw new Error(`AI returned an illegal move for ${engine.id}`);
-            commit(engine.applyMove(state, move), move);
-          })
-          .catch((error: unknown) => {
-            if (!active || error instanceof AIRequestCancelledError) return;
-            console.error(`Unable to select an AI move for ${engine.id}:`, error);
-          });
-      },
-      400 + Math.random() * 400,
-    );
+      void search
+        .then((move) => {
+          if (!active || move === null) return;
+          const legal = engine
+            .legalMoves(state)
+            .some(
+              (candidate) => engine.movesEqual?.(candidate, move) ?? Object.is(candidate, move),
+            );
+          if (!legal) throw new Error(`AI returned an illegal move for ${engine.id}`);
+          setAiError(null);
+          commit(engine.applyMove(state, move), move);
+        })
+        .catch((error: unknown) => {
+          if (!active || error instanceof AIRequestCancelledError) return;
+          console.error(`Unable to select an AI move for ${engine.id}:`, error);
+          setAiError(error instanceof Error ? error.message : 'Unable to select a computer move.');
+        });
+    }, delay);
     return () => {
       active = false;
       window.clearTimeout(timer);
       controller.abort();
     };
-  }, [chooseMove, commit, computerTurn, difficulty, engine, state]);
+  }, [chooseMove, commit, computerTurn, difficulty, engine, state, thinkingDelayMs]);
 
   useEffect(() => {
     if (over || !engine.passTurn || engine.legalMoves(state).length > 0) return;
@@ -148,6 +151,7 @@ export function useEngineMatch<State, Move>({
     setMoveHistory([]);
     setDialogOpen(false);
     setPointsEarned(0);
+    setAiError(null);
   };
 
   const canUndo = enableUndo && !computerTurn && !over && moveHistory.length > 0;
@@ -178,6 +182,7 @@ export function useEngineMatch<State, Move>({
     scores,
     dialogOpen,
     pointsEarned,
+    aiError,
     moveHistory,
     canUndo,
     closeDialog: () => setDialogOpen(false),

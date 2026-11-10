@@ -5,11 +5,16 @@ import PwaNotifications from '@/components/PwaNotifications';
 
 export default function AppLayout() {
   const location = useLocation();
+  const isLatrunculi = location.pathname.startsWith('/games/latrunculi');
 
   return (
     <div className="flex min-h-dvh flex-col bg-background text-foreground">
       <TopNav />
-      <div className="mx-auto flex w-full max-w-md flex-1 flex-col px-5 pt-4">
+      <div
+        className={`mx-auto flex w-full flex-1 flex-col px-5 pt-4 ${
+          isLatrunculi ? 'max-w-6xl lg:px-8' : 'max-w-md'
+        }`}
+      >
         <main key={location.pathname} className="flex flex-1 flex-col animate-fade-in">
           <Outlet />
         </main>
