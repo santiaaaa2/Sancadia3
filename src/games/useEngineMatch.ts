@@ -12,12 +12,16 @@ interface EngineMatchOptions<State, Move> {
   engine: GameEngine<State, Move>;
   config: MatchConfig;
   chooseMove: (state: State, difficulty: Difficulty) => Move | null;
+  enableUndo?: boolean;
+  initialState?: () => State;
 }
 
 export function useEngineMatch<State, Move>({
   engine,
   config,
   chooseMove,
+  enableUndo = false,
+  initialState = engine.initialState,
 }: EngineMatchOptions<State, Move>) {
   const { place, win, lose, draw } = useFeedback();
   const { recordResult } = useStats();
@@ -29,7 +33,9 @@ export function useEngineMatch<State, Move>({
   const computerSide: Player | null = config.mode === 'computer' ? (humanSide === 0 ? 1 : 0) : null;
   const difficulty = config.mode === 'computer' ? config.difficulty : null;
 
-  const [state, setState] = useState<State>(() => engine.initialState());
+  const [state, setState] = useState<State>(initialState);
+  const [pastStates, setPastStates] = useState<State[]>([]);
+  const [moveHistory, setMoveHistory] = useState<Array<{ move: Move; player: Player }>>([]);
   const [scores, setScores] = useState<MatchScores>(NO_SCORES);
   const [dialogOpen, setDialogOpen] = useState(false);
   const [pointsEarned, setPointsEarned] = useState(0);
@@ -40,7 +46,16 @@ export function useEngineMatch<State, Move>({
   const computerTurn = computerSide !== null && !over && turn === computerSide;
 
   const commit = useCallback(
-    (next: State) => {
+    (next: State, move?: Move) => {
+      if (enableUndo) {
+        setPastStates((previous) => [...previous, state]);
+        if (move !== undefined) {
+          setMoveHistory((previous) => [
+            ...previous,
+            { move, player: engine.currentPlayer(state) },
+          ]);
+        }
+      }
       setState(next);
       place();
       const finished = engine.winner(next);
@@ -55,7 +70,7 @@ export function useEngineMatch<State, Move>({
       else lose();
       setDialogOpen(true);
     },
-    [config.mode, draw, engine, humanSide, lose, place, win],
+    [config.mode, draw, enableUndo, engine, humanSide, lose, place, state, win],
   );
 
   useEffect(() => {
@@ -95,7 +110,7 @@ export function useEngineMatch<State, Move>({
                 (candidate) => engine.movesEqual?.(candidate, move) ?? Object.is(candidate, move),
               );
             if (!legal) throw new Error(`AI returned an illegal move for ${engine.id}`);
-            commit(engine.applyMove(state, move));
+            commit(engine.applyMove(state, move), move);
           })
           .catch((error: unknown) => {
             if (!active || error instanceof AIRequestCancelledError) return;
@@ -123,15 +138,35 @@ export function useEngineMatch<State, Move>({
       !legal.some((candidate) => engine.movesEqual?.(candidate, move) ?? Object.is(candidate, move))
     )
       return;
-    commit(engine.applyMove(state, move));
+    commit(engine.applyMove(state, move), move);
   };
 
   const restart = () => {
     matchNumber.current++;
-    setState(engine.initialState());
+    setState(initialState());
+    setPastStates([]);
+    setMoveHistory([]);
     setDialogOpen(false);
     setPointsEarned(0);
   };
+
+  const canUndo = enableUndo && !computerTurn && !over && moveHistory.length > 0;
+  const undoMove = useCallback(() => {
+    if (!canUndo) return;
+    const lastMove = moveHistory[moveHistory.length - 1];
+    const movesToUndo =
+      config.mode === 'computer' && lastMove?.player !== humanSide
+        ? Math.min(2, moveHistory.length)
+        : 1;
+    const previousStateIndex = pastStates.length - movesToUndo;
+    const previousState = pastStates[previousStateIndex];
+    if (previousState === undefined) return;
+
+    setState(previousState);
+    setPastStates((previous) => previous.slice(0, previousStateIndex));
+    setMoveHistory((previous) => previous.slice(0, previous.length - movesToUndo));
+    setDialogOpen(false);
+  }, [canUndo, config.mode, humanSide, moveHistory, pastStates]);
 
   return {
     state,
@@ -143,8 +178,12 @@ export function useEngineMatch<State, Move>({
     scores,
     dialogOpen,
     pointsEarned,
+    moveHistory,
+    canUndo,
     closeDialog: () => setDialogOpen(false),
     playMove,
     restart,
+    undoMove,
+    finish: (next: State) => commit(next),
   };
 }

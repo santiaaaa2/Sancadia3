@@ -4,6 +4,7 @@ import type { GameEngine, Player } from '@/engine/types';
 
 interface TreeNode {
   children: Record<string, string>;
+  player?: Player;
   winner?: Player | 'draw';
 }
 
@@ -33,7 +34,7 @@ function makeTreeEngine(tree: Record<string, TreeNode>): GameEngine<TreeState, s
       }
       return {
         id: nextId,
-        player: state.player === 0 ? 1 : 0,
+        player: getNode(nextId).player ?? (state.player === 0 ? 1 : 0),
       };
     },
     isTerminal: (state) => getNode(state.id).winner !== undefined,
@@ -92,6 +93,18 @@ describe('getBestMove', () => {
       draw: { children: {}, winner: 'draw' },
     });
     expect(getBestMove(engine, engine.initialState(), { maxDepth: Infinity })).toBe('safe');
+  });
+
+  it('keeps maximizing when the same player gets another turn', () => {
+    const engine = makeTreeEngine({
+      root: { children: { extraTurn: 'extraTurn', draw: 'drawn' } },
+      extraTurn: { children: { win: 'won', lose: 'lost' }, player: 0 },
+      won: { children: {}, player: 0, winner: 0 },
+      lost: { children: {}, player: 0, winner: 1 },
+      drawn: { children: {}, winner: 'draw' },
+    });
+
+    expect(getBestMove(engine, engine.initialState(), { maxDepth: Infinity })).toBe('extraTurn');
   });
 
   it('picks randomly among equally good moves', () => {

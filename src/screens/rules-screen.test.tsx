@@ -80,15 +80,15 @@ describe('How to play rules', () => {
     await user.click(screen.getByRole('button', { name: 'Play' }));
 
     expect(screen.getByRole('heading', { name: 'Noughts and Crosses', level: 1 })).toBeTruthy();
-    expect(screen.getByRole('button', { name: 'Start game' })).toBeTruthy();
+    expect(await screen.findByRole('button', { name: 'Start game' })).toBeTruthy();
   });
 
   it('offers Rules on the game pre-game screen', async () => {
     const user = userEvent.setup();
     renderRulesApp('/games/connect-4');
 
-    await user.click(screen.getByRole('link', { name: 'How to play Connect 4' }));
+    await user.click(await screen.findByRole('link', { name: 'How to play Connect 4' }));
 
-    expect(screen.getByRole('heading', { name: 'Connect 4 Rules', level: 1 })).toBeTruthy();
+    expect(await screen.findByRole('heading', { name: 'Connect 4 Rules', level: 1 })).toBeTruthy();
   });
 });

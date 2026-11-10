@@ -13,6 +13,7 @@ class SearchTimeout extends Error {}
 interface SearchContext<State> {
   evaluate: SearchOptions<State>['evaluate'];
   deadline: number | null;
+  maximizingPlayer: Player;
 }
 
 function searchMoves<State, Move>(engine: GameEngine<State, Move>, state: State): Move[] {
@@ -35,18 +36,18 @@ function search<State, Move>(
     const result = engine.winner(state);
     if (result === null || result === 'draw') return 0;
     const score = WIN_SCORE - ply;
-    return result === engine.currentPlayer(state) ? score : -score;
+    return result === context.maximizingPlayer ? score : -score;
   }
 
   const moves = searchMoves(engine, state);
   if (moves.length === 0) {
     if (engine.passTurn) {
-      return -search(
+      return search(
         engine,
         engine.passTurn(state),
         Math.max(0, depth - 1),
-        -beta,
-        -alpha,
+        alpha,
+        beta,
         ply + 1,
         context,
       );
@@ -55,15 +56,20 @@ function search<State, Move>(
   }
 
   if (depth <= 0) {
-    return context.evaluate ? context.evaluate(state, engine.currentPlayer(state)) : 0;
+    if (!context.evaluate) return 0;
+    const player = engine.currentPlayer(state);
+    const score = context.evaluate(state, player);
+    return player === context.maximizingPlayer ? score : -score;
   }
 
-  let best = -Infinity;
+  const maximizing = engine.currentPlayer(state) === context.maximizingPlayer;
+  let best = maximizing ? -Infinity : Infinity;
   for (const move of moves) {
     const next = engine.applyMove(state, move);
-    const value = -search(engine, next, depth - 1, -beta, -alpha, ply + 1, context);
-    if (value > best) best = value;
-    if (best > alpha) alpha = best;
+    const value = search(engine, next, depth - 1, alpha, beta, ply + 1, context);
+    if (maximizing ? value > best : value < best) best = value;
+    if (maximizing && best > alpha) alpha = best;
+    if (!maximizing && best < beta) beta = best;
     if (alpha >= beta) break;
   }
   return best;
@@ -76,12 +82,14 @@ function bestMovesAtDepth<State, Move>(
   depth: number,
   context: SearchContext<State>,
 ): Move[] {
+  const maximizingPlayer = engine.currentPlayer(state);
+  const contextWithPlayer = { ...context, maximizingPlayer };
   let bestValue = -Infinity;
   let bestMoves: Move[] = [];
 
   for (const move of moves) {
     const next = engine.applyMove(state, move);
-    const value = -search(engine, next, depth - 1, -Infinity, Infinity, 1, context);
+    const value = search(engine, next, depth - 1, -Infinity, Infinity, 1, contextWithPlayer);
     if (value > bestValue) {
       bestValue = value;
       bestMoves = [move];
@@ -111,11 +119,19 @@ export function getBestMove<State, Move>(
   if (moves.length === 0) return null;
 
   if (options.timeLimitMs === undefined) {
-    const context = { evaluate: options.evaluate, deadline: null };
+    const context = {
+      evaluate: options.evaluate,
+      deadline: null,
+      maximizingPlayer: engine.currentPlayer(state),
+    };
     return pickRandom(bestMovesAtDepth(engine, state, moves, options.maxDepth, context));
   }
 
-  const context = { evaluate: options.evaluate, deadline: Date.now() + options.timeLimitMs };
+  const context = {
+    evaluate: options.evaluate,
+    deadline: Date.now() + options.timeLimitMs,
+    maximizingPlayer: engine.currentPlayer(state),
+  };
   const firstMove = moves[0];
   if (firstMove === undefined) return null;
 

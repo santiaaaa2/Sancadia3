@@ -5,6 +5,7 @@ export type RulesGameId =
   | 'connect-4'
   | 'gomoku'
   | 'reversi'
+  | 'latrunculi'
   | 'checkers'
   | 'battleships'
   | 'mastermind'
@@ -150,6 +151,36 @@ export const rulesContent = {
     tips: [
       'Kings can move in both diagonal directions.',
       'A piece on the back row cannot be jumped from behind by a man moving forward.',
+    ],
+  },
+  latrunculi: {
+    title: 'LATRUNCULI',
+    goal: 'Outmaneuver the opposing army and capture its pieces by surrounding them.',
+    setup:
+      'Play on an 8-by-8 battlefield. Each army begins with sixteen stones arranged in two ranks at opposite ends; Player 1 moves first.',
+    howToPlay: [
+      'Select one of your stones, then choose any empty square along the same row or column.',
+      'A stone cannot pass through another stone.',
+      'After a move, any adjacent opposing stone bracketed between your moved stone and another of your stones is captured.',
+      'Players alternate turns. Choose two-player mode for pass-and-play or play against the computer.',
+    ],
+    winning:
+      'The default rules award victory when the opponent has no legal move, has no surviving stones, or resigns. If 200 moves pass without a winner, the game is a draw.',
+    specialRules: [
+      'Movement is orthogonal and may cover any clear distance.',
+      'After each move, an adjacent enemy stone bracketed horizontally or vertically between the moved stone and another friendly stone is captured. One move may capture multiple stones.',
+      'Diagonal captures are not allowed, and the board edge does not count as a capturing stone. This is the selected reconstruction variant; ancient rules are not known with certainty.',
+      'A majority-capture victory is disabled by default and is available only as an explicit future variant rule.',
+    ],
+    difficultyNotes: {
+      beginner: 'The computer plays with a short search and may occasionally make a weaker move.',
+      professional: 'The computer looks ahead and balances captures with board control.',
+      expert: 'The computer searches deeper and does not deliberately choose a weaker move.',
+    },
+    tips: [
+      'Keep stones near one another so they can support captures.',
+      'Watch for enemy stones that can become trapped between two of yours.',
+      'An empty route can be as valuable as an immediate capture.',
     ],
   },
   battleships: {

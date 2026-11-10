@@ -7,6 +7,19 @@ import StatsProvider from '@/components/StatsProvider';
 import GameScreen from '@/screens/GameScreen';
 import { games } from '@/games/registry';
 
+const gamesWithSetup = new Set([
+  'noughts-and-crosses',
+  'connect-4',
+  'gomoku',
+  'reversi',
+  'latrunculi',
+  'checkers',
+  'battleships',
+  'mastermind',
+  'bullscows',
+  'hangman',
+]);
+
 function renderGame(gameId: string) {
   return render(
     <MemoryRouter initialEntries={[`/games/${gameId}`]}>
@@ -31,11 +44,11 @@ describe('shared game pre-start layout', () => {
 
   it.each([360, 430])(
     'places Start, setup options, and links in order for every available game at %ipx',
-    (width) => {
+    async (width) => {
       Object.defineProperty(window, 'innerWidth', { configurable: true, value: width });
-      for (const game of games.filter((entry) => entry.status === 'available')) {
+      for (const game of games.filter((entry) => entry.status === 'available' && gamesWithSetup.has(entry.id))) {
         const view = renderGame(game.id);
-        const start = screen.getByRole('button', { name: 'Start game' });
+        const start = await screen.findByRole('button', { name: 'Start game' });
         const setup = screen.getByTestId('game-setup-card');
         const rules = screen.getByRole('link', { name: `How to play ${game.name}` });
         const gameSettings = screen.getByRole('link', { name: 'Game settings' });
@@ -70,7 +83,7 @@ describe('shared game pre-start layout', () => {
     const user = userEvent.setup();
     renderGame('mastermind');
 
-    await user.selectOptions(screen.getByRole('combobox', { name: 'Difficulty' }), 'expert');
+    await user.selectOptions(await screen.findByRole('combobox', { name: 'Difficulty' }), 'expert');
     await user.click(screen.getByRole('button', { name: '2 Players' }));
     expect(
       screen.getByRole('button', { name: 'Start game' }).getAttribute('aria-describedby'),
@@ -85,7 +98,7 @@ describe('shared game pre-start layout', () => {
     const user = userEvent.setup();
     renderGame('connect-4');
 
-    await user.click(screen.getByRole('radio', { name: 'Go second' }));
+    await user.click(await screen.findByRole('radio', { name: 'Go second' }));
     await user.click(screen.getByRole('radio', { name: 'Expert' }));
     const start = screen.getByRole('button', { name: 'Start game' });
     expect(document.getElementById(start.getAttribute('aria-describedby')!)?.textContent).toContain(

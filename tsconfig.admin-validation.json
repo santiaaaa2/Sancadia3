@@ -1,0 +1,13 @@
+{
+  "extends": "./tsconfig.app.json",
+  "include": [
+    "src/components/StatsProvider.tsx",
+    "src/hooks/usePublishedContent.ts",
+    "src/lib/admin.ts",
+    "src/lib/database.types.ts",
+    "src/screens/AdminScreen.tsx",
+    "src/screens/AdminScreen.test.tsx",
+    "src/screens/HomeScreen.tsx",
+    "src/screens/ShopScreen.tsx"
+  ]
+}

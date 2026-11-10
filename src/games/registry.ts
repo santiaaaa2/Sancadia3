@@ -1,13 +1,4 @@
-import type { ComponentType } from 'react';
-import BullsCowsGame from '@/games/bullscows/BullsCowsGame';
-import CheckersGame from '@/games/checkers/CheckersGame';
-import Connect4Game from '@/games/connect4/Connect4Game';
-import GomokuMatch from '@/games/gomoku/GomokuMatch';
-import HangmanGame from '@/games/hangman/HangmanGame';
-import MastermindGame from '@/games/mastermind/MastermindGame';
-import ReversiGame from '@/games/reversi/ReversiGame';
-import BattleshipsGame from '@/games/battleships/BattleshipsGame';
-import TicTacToeGame from '@/games/tictactoe/TicTacToeGame';
+import { lazy, type ComponentType, type LazyExoticComponent } from 'react';
 import type { NationId } from '@/games/nations';
 
 export type GameStatus = 'available' | 'coming-soon';
@@ -93,6 +84,18 @@ export const games: GameInfo[] = [
     capabilities: TURN_BASED_CAPABILITIES,
   },
   {
+    id: 'latrunculi',
+    name: 'LATRUNCULI',
+    description: 'Command Roman stone armies in this ancient game of movement and capture.',
+    minPlayers: 2,
+    maxPlayers: 2,
+    icon: '🏛️',
+    status: 'available',
+    type: 'versus',
+    nations: ['italy'],
+    capabilities: TURN_BASED_CAPABILITIES,
+  },
+  {
     id: 'checkers',
     name: 'Checkers',
     description: 'Jump, capture, and crown your kings.',
@@ -158,7 +161,7 @@ export const games: GameInfo[] = [
     minPlayers: 2,
     maxPlayers: 2,
     icon: '🔲',
-    status: 'coming-soon',
+    status: 'available',
     type: 'versus',
     capabilities: TURN_BASED_CAPABILITIES,
   },
@@ -169,7 +172,7 @@ export const games: GameInfo[] = [
     minPlayers: 2,
     maxPlayers: 2,
     icon: '🫘',
-    status: 'coming-soon',
+    status: 'available',
     type: 'versus',
     capabilities: TURN_BASED_CAPABILITIES,
   },
@@ -180,7 +183,7 @@ export const games: GameInfo[] = [
     minPlayers: 2,
     maxPlayers: 2,
     icon: '🁣',
-    status: 'coming-soon',
+    status: 'available',
     type: 'versus',
     capabilities: TURN_BASED_CAPABILITIES,
   },
@@ -191,7 +194,7 @@ export const games: GameInfo[] = [
     minPlayers: 2,
     maxPlayers: 4,
     icon: '🎲',
-    status: 'coming-soon',
+    status: 'available',
     type: 'versus',
     capabilities: TURN_BASED_CAPABILITIES,
   },
@@ -202,7 +205,7 @@ export const games: GameInfo[] = [
     minPlayers: 1,
     maxPlayers: 1,
     icon: '🐍',
-    status: 'coming-soon',
+    status: 'available',
     type: 'puzzle',
     capabilities: PUZZLE_CAPABILITIES,
   },
@@ -213,7 +216,7 @@ export const games: GameInfo[] = [
     minPlayers: 1,
     maxPlayers: 1,
     icon: '🔢',
-    status: 'coming-soon',
+    status: 'available',
     type: 'puzzle',
     capabilities: PUZZLE_CAPABILITIES,
   },
@@ -235,14 +238,22 @@ export function getGamesForNation(nationId: NationId, gameList: GameInfo[] = gam
   return gameList.filter((game) => game.nations?.includes(nationId));
 }
 
-export const gameComponents: Partial<Record<string, ComponentType>> = {
-  'noughts-and-crosses': TicTacToeGame,
-  'connect-4': Connect4Game,
-  gomoku: GomokuMatch,
-  reversi: ReversiGame,
-  checkers: CheckersGame,
-  battleships: BattleshipsGame,
-  mastermind: MastermindGame,
-  bullscows: BullsCowsGame,
-  hangman: HangmanGame,
+export const gameComponents: Partial<Record<string, LazyExoticComponent<ComponentType>>> = {
+  'noughts-and-crosses': lazy(() => import('@/games/tictactoe/TicTacToeGame')),
+  'connect-4': lazy(() => import('@/games/connect4/Connect4Game')),
+  gomoku: lazy(() => import('@/games/gomoku/GomokuMatch')),
+  reversi: lazy(() => import('@/games/reversi/ReversiGame')),
+  latrunculi: lazy(() => import('@/games/latrunculi/LatrunculiGame')),
+  checkers: lazy(() => import('@/games/checkers/CheckersGame')),
+  battleships: lazy(() => import('@/games/battleships/BattleshipsGame')),
+  mastermind: lazy(() => import('@/games/mastermind/MastermindGame')),
+  bullscows: lazy(() => import('@/games/bullscows/BullsCowsGame')),
+  hangman: lazy(() => import('@/games/hangman/HangmanGame')),
+  dominoes: lazy(() => import('@/games/dominoes/DominoesGame')),
+  'dots-and-boxes': lazy(() => import('@/games/dots-and-boxes/DotsAndBoxesGame')),
+  mancala: lazy(() => import('@/games/mancala/MancalaGame')),
+  ludo: lazy(() => import('@/games/ludo/LudoGame')),
+  snake: lazy(() => import('@/games/snake/SnakeGame')),
+  '2048': lazy(() => import('@/games/2048/Game2048')),
+  minesweeper: lazy(() => import('@/games/minesweeper/MinesweeperGame')),
 };

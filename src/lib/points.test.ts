@@ -1,5 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import { calculatePoints, calculatePuzzlePoints } from '@/lib/points';
+import { games } from '@/games/registry';
 
 describe('calculatePoints', () => {
   it('awards difficulty-based win points', () => {
@@ -16,6 +17,14 @@ describe('calculatePoints', () => {
   it('awards fixed points for draws and losses', () => {
     expect(calculatePoints('draw', 'expert', 8)).toBe(5);
     expect(calculatePoints('lose', 'expert', 8)).toBe(1);
+  });
+
+  it('applies the shared points rules to every registered game', () => {
+    for (const game of games) {
+      expect(calculatePoints('win', 'beginner'), game.id).toBe(10);
+      expect(calculatePoints('draw', 'beginner'), game.id).toBe(5);
+      expect(calculatePoints('lose', 'beginner'), game.id).toBe(1);
+    }
   });
 
   it('breaks down puzzle points and applies hint costs without zero-point wins', () => {

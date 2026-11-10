@@ -13,9 +13,12 @@ import { evaluate as evaluateCheckers } from '@/games/checkers/ai';
 import { checkers, type CheckersState } from '@/games/checkers/rules';
 import { evaluate as evaluateReversi } from '@/games/reversi/ai';
 import { reversi, type ReversiState } from '@/games/reversi/rules';
+import { evaluate as evaluateLatrunculi } from '@/games/latrunculi/ai';
+import { latrunculi, MAX_MOVES, type LatrunculiState } from '@/games/latrunculi/rules';
 import { ticTacToe, type TicTacToeState } from '@/games/tictactoe/rules';
 
-export type WorkerGameId = 'noughts-and-crosses' | 'connect-4' | 'gomoku' | 'reversi' | 'checkers';
+export type WorkerGameId =
+  'noughts-and-crosses' | 'connect-4' | 'gomoku' | 'reversi' | 'checkers' | 'latrunculi';
 
 export interface WorkerAiEntry {
   depthCaps: DifficultyCaps;
@@ -70,6 +73,32 @@ function isReversiState(value: unknown): value is ReversiState {
     isPlayer(value.turn) &&
     typeof value.passed === 'boolean' &&
     isCellBoard(value.board, 8)
+  );
+}
+
+function isLatrunculiState(value: unknown): value is LatrunculiState {
+  return (
+    isRecord(value) &&
+    isPlayer(value.turn) &&
+    typeof value.totalMoves === 'number' &&
+    Number.isInteger(value.totalMoves) &&
+    value.totalMoves >= 0 &&
+    value.totalMoves <= MAX_MOVES &&
+    isCellBoard(value.board, 8) &&
+    Array.isArray(value.survivingPieces) &&
+    value.survivingPieces.length === 2 &&
+    value.survivingPieces.every((count) => Number.isInteger(count) && count >= 0) &&
+    Array.isArray(value.capturedPieces) &&
+    value.capturedPieces.length === 2 &&
+    value.capturedPieces.every((count) => Number.isInteger(count) && count >= 0) &&
+    Array.isArray(value.moveHistory) &&
+    (value.status === 'active' || value.status === 'completed') &&
+    (value.winner === null || isPlayer(value.winner) || value.winner === 'draw') &&
+    (value.gameMode === 'two-player' || value.gameMode === 'computer') &&
+    isRecord(value.victoryRules) &&
+    typeof value.victoryRules.noLegalMoves === 'boolean' &&
+    typeof value.victoryRules.noPieces === 'boolean' &&
+    typeof value.victoryRules.majorityCapture === 'boolean'
   );
 }
 
@@ -154,6 +183,10 @@ const CHECKERS_CAPS: DifficultyCaps = {
   maxDepthCap: { beginner: 1, professional: 4, expert: 7 },
   timeLimitMs: 1500,
 };
+const LATRUNCULI_CAPS: DifficultyCaps = {
+  maxDepthCap: { beginner: 1, professional: 2, expert: 3 },
+  timeLimitMs: 1200,
+};
 
 export const aiRegistry: Record<WorkerGameId, WorkerAiEntry> = {
   'noughts-and-crosses': createEntry(ticTacToe, TICTACTOE_CAPS, isTicTacToeState),
@@ -161,6 +194,7 @@ export const aiRegistry: Record<WorkerGameId, WorkerAiEntry> = {
   gomoku: createEntry(gomoku, GOMOKU_CAPS, isGomokuState, evaluateGomoku),
   reversi: createEntry(reversi, REVERSI_CAPS, isReversiState, evaluateReversi),
   checkers: createEntry(checkers, CHECKERS_CAPS, isCheckersState, evaluateCheckers),
+  latrunculi: createEntry(latrunculi, LATRUNCULI_CAPS, isLatrunculiState, evaluateLatrunculi),
 };
 
 export function isWorkerGameId(value: string): value is WorkerGameId {

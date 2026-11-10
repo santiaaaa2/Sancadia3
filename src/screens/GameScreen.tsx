@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { Suspense, useState } from 'react';
 import { RotateCcw } from 'lucide-react';
 import { Navigate, useParams } from 'react-router-dom';
 import Button from '@/components/Button';
@@ -32,7 +32,9 @@ export default function GameScreen() {
     return (
       <div className="flex flex-1 flex-col">
         <ScreenHeader title={game.name} />
-        <GameComponent />
+        <Suspense fallback={<p role="status">Loading game…</p>}>
+          <GameComponent />
+        </Suspense>
       </div>
     );
   }
