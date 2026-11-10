@@ -11,6 +11,8 @@ export type ThemeTokenName =
   | 'primary-foreground'
   | 'primary-soft'
   | 'accent'
+  | 'online-accent'
+  | 'online-accent-foreground'
   | 'danger'
   | 'danger-foreground'
   | 'board-light'
@@ -40,6 +42,8 @@ export const themes: Theme[] = [
       'primary-foreground': '#ffffff',
       'primary-soft': '#ecfdf5',
       accent: '#a84b00',
+      'online-accent': '#facc15',
+      'online-accent-foreground': '#1c2421',
       danger: '#b91c1c',
       'danger-foreground': '#ffffff',
       'board-light': '#f3e9d2',
@@ -62,6 +66,8 @@ export const themes: Theme[] = [
       'primary-foreground': '#04261c',
       'primary-soft': '#14302c',
       accent: '#60a5fa',
+      'online-accent': '#facc15',
+      'online-accent-foreground': '#1c2421',
       danger: '#f87171',
       'danger-foreground': '#2a0a0a',
       'board-light': '#223049',
@@ -84,6 +90,8 @@ export const themes: Theme[] = [
       'primary-foreground': '#ffffff',
       'primary-soft': '#ffedd5',
       accent: '#a61b5b',
+      'online-accent': '#facc15',
+      'online-accent-foreground': '#1c2421',
       danger: '#b91c1c',
       'danger-foreground': '#ffffff',
       'board-light': '#fde3c8',
@@ -111,6 +119,8 @@ export function getTheme(id: ThemeId): Theme {
         'primary-foreground': '#ffffff',
         'primary-soft': '#ecfdf5',
         accent: '#a84b00',
+        'online-accent': '#facc15',
+        'online-accent-foreground': '#1c2421',
         danger: '#b91c1c',
         'danger-foreground': '#ffffff',
         'board-light': '#f3e9d2',

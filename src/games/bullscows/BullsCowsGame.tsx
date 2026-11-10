@@ -15,6 +15,7 @@ export default function BullsCowsGame() {
   return (
     <CodebreakerGame
       gameId="bullscows"
+      gameName="Bulls and Cows"
       difficulty={difficulty}
       onDifficultyChange={setDifficulty}
       config={config}

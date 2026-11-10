@@ -4,11 +4,12 @@ import { Link } from 'react-router-dom';
 interface ScreenHeaderProps {
   title: string;
   backTo?: string;
+  className?: string;
 }
 
-export default function ScreenHeader({ title, backTo }: ScreenHeaderProps) {
+export default function ScreenHeader({ title, backTo, className }: ScreenHeaderProps) {
   return (
-    <header className="flex min-h-11 items-center gap-3 pb-6 pt-2">
+    <header className={`flex min-h-11 items-center gap-3 pb-6 pt-2 ${className ?? ''}`.trim()}>
       {backTo && (
         <Link
           to={backTo}

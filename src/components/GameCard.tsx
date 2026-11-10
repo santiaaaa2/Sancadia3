@@ -1,4 +1,5 @@
-import { Link } from 'react-router-dom';
+import { BookOpen } from 'lucide-react';
+import { useNavigate, Link } from 'react-router-dom';
 import type { GameInfo } from '@/games/registry';
 
 interface GameCardProps {
@@ -6,13 +7,14 @@ interface GameCardProps {
 }
 
 const cardBase =
-  'flex min-h-11 items-center gap-4 rounded-3xl bg-surface p-4 text-left shadow-sm ring-1 ring-border';
+  'relative flex min-h-[8.5rem] items-start rounded-3xl bg-surface p-4 shadow-sm ring-1 ring-border';
 
 function formatPlayers(min: number, max: number) {
   return min === max ? `${min} players` : `${min}–${max} players`;
 }
 
 export default function GameCard({ game }: GameCardProps) {
+  const navigate = useNavigate();
   const isAvailable = game.status === 'available';
 
   const content = (
@@ -40,20 +42,32 @@ export default function GameCard({ game }: GameCardProps) {
     </>
   );
 
-  if (!isAvailable) {
-    return (
-      <div aria-disabled="true" className={`${cardBase} cursor-not-allowed opacity-60 grayscale`}>
-        {content}
-      </div>
-    );
-  }
-
   return (
-    <Link
-      to={`/games/${game.id}`}
-      className={`${cardBase} transition duration-200 hover:-translate-y-0.5 hover:shadow-md focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-primary/40 active:scale-[0.98]`}
-    >
-      {content}
-    </Link>
+    <article className={`${cardBase} ${isAvailable ? '' : 'cursor-not-allowed'}`}>
+      {isAvailable ? (
+        <Link
+          to={`/games/${game.id}`}
+          className="flex min-w-0 flex-1 items-center gap-4 rounded-xl pb-12 pr-2 text-left transition duration-200 hover:-translate-y-0.5 focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-primary/40 active:scale-[0.98]"
+        >
+          {content}
+        </Link>
+      ) : (
+        <div aria-disabled="true" className="flex min-w-0 flex-1 items-center gap-4 pb-12 pr-2">
+          {content}
+        </div>
+      )}
+      <button
+        type="button"
+        aria-label={`How to play ${game.name}`}
+        onClick={(event) => {
+          event.stopPropagation();
+          event.preventDefault();
+          navigate(`/games/${game.id}/rules`);
+        }}
+        className="absolute bottom-2 right-2 flex h-11 w-11 items-center justify-center rounded-full bg-background text-foreground ring-1 ring-border transition hover:bg-primary-soft focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-primary/40"
+      >
+        <BookOpen className="h-5 w-5" aria-hidden="true" />
+      </button>
+    </article>
   );
 }

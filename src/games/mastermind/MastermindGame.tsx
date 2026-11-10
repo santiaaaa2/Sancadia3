@@ -20,6 +20,7 @@ export default function MastermindGame() {
   return (
     <CodebreakerGame
       gameId="mastermind"
+      gameName="Mastermind"
       difficulty={difficulty}
       onDifficultyChange={setDifficulty}
       config={config}

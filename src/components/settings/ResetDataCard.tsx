@@ -1,22 +1,35 @@
 import { useState } from 'react';
 import Button from '@/components/Button';
-import Card from '@/components/Card';
+import SettingButton from '@/components/settings/SettingButton';
 import Dialog from '@/components/Dialog';
 import { useSettings } from '@/hooks/useSettings';
 import { useStats } from '@/hooks/useStats';
+import type { SettingStatus } from '@/components/settings/SettingRow';
 
-export default function ResetDataCard() {
+interface ResetDataCardProps {
+  label?: string;
+  description?: string;
+  status?: SettingStatus;
+}
+
+export default function ResetDataCard({
+  label = 'Reset all data',
+  description = 'Clears your settings, scores, streaks and points.',
+  status = 'active',
+}: ResetDataCardProps) {
   const { resetSettings } = useSettings();
   const { resetStats } = useStats();
   const [confirmOpen, setConfirmOpen] = useState(false);
 
   return (
-    <Card>
-      <h2 className="text-lg font-bold">Reset all data</h2>
-      <p className="mt-1 text-subtle">Clears your settings, scores, streaks and points.</p>
-      <Button variant="danger" className="mt-4 w-full" onClick={() => setConfirmOpen(true)}>
-        Reset all data
-      </Button>
+    <>
+      <SettingButton
+        label={label}
+        description={description}
+        status={status}
+        variant="danger"
+        onClick={() => setConfirmOpen(true)}
+      />
       <Dialog
         open={confirmOpen}
         onClose={() => setConfirmOpen(false)}
@@ -39,6 +52,6 @@ export default function ResetDataCard() {
           </Button>
         </div>
       </Dialog>
-    </Card>
+    </>
   );
 }

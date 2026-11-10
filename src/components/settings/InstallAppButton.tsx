@@ -1,12 +1,23 @@
 import { useEffect, useState } from 'react';
-import Button from '@/components/Button';
+import SettingButton from '@/components/settings/SettingButton';
+import type { SettingStatus } from '@/components/settings/SettingRow';
 
 interface InstallPromptEvent extends Event {
   prompt: () => Promise<void>;
   userChoice: Promise<{ outcome: 'accepted' | 'dismissed'; platform: string }>;
 }
 
-export default function InstallAppButton() {
+interface InstallAppButtonProps {
+  label?: string;
+  description?: string;
+  status?: SettingStatus;
+}
+
+export default function InstallAppButton({
+  label = 'Install app',
+  description,
+  status = 'active',
+}: InstallAppButtonProps) {
   const [installPrompt, setInstallPrompt] = useState<InstallPromptEvent | null>(null);
 
   useEffect(() => {
@@ -28,19 +39,21 @@ export default function InstallAppButton() {
     };
   }, []);
 
-  if (!installPrompt) return null;
-
   return (
-    <Button
-      variant="secondary"
-      className="w-full"
+    <SettingButton
+      label={label}
+      description={
+        description ??
+        (installPrompt ? 'Add the arcade to your device.' : 'Installation is not available here.')
+      }
+      status={status}
+      disabled={!installPrompt}
       onClick={async () => {
+        if (!installPrompt) return;
         await installPrompt.prompt();
         await installPrompt.userChoice;
         setInstallPrompt(null);
       }}
-    >
-      Install app
-    </Button>
+    />
   );
 }

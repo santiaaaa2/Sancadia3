@@ -1,8 +1,10 @@
 import { useCallback, useEffect, useId, useMemo, useRef, useState } from 'react';
 import Button from '@/components/Button';
 import Card from '@/components/Card';
+import GamePreStart from '@/components/GamePreStart';
 import GameOverDialog from '@/components/GameOverDialog';
 import PassDeviceScreen from '@/components/PassDeviceScreen';
+import PuzzleSetupOptions, { type PuzzlePlayerMode } from '@/components/PuzzleSetupOptions';
 import SecretEntry from '@/components/SecretEntry';
 import type { Difficulty } from '@/engine/difficulty';
 import { useFeedback } from '@/hooks/useFeedback';
@@ -13,7 +15,7 @@ import { guessLetter, maskedWord, status } from '@/games/hangman/rules';
 import { beginnerWords, expertWords, professionalWords } from '@/games/hangman/words';
 import { pickHangmanWord } from '@/games/hangman/wordPicker';
 
-type PlayerMode = 'solo' | 'two-player';
+type PlayerMode = PuzzlePlayerMode;
 type Stage = 'secret-entry' | 'handoff' | 'playing';
 
 const settings: Record<
@@ -43,6 +45,7 @@ export default function HangmanGame() {
   const resultNumber = useRef(0);
   const [difficulty, setDifficulty] = useState<Difficulty>('beginner');
   const [mode, setMode] = useState<PlayerMode>('solo');
+  const [started, setStarted] = useState(false);
   const [stage, setStage] = useState<Stage>('playing');
   const [word, setWord] = useState(() => pickHangmanWord('beginner'));
   const [secretEntry, setSecretEntry] = useState('');
@@ -222,6 +225,26 @@ export default function HangmanGame() {
     setHintsUsed(nextHintsUsed);
     chooseLetter(letter, nextHintsUsed);
   };
+
+  if (!started) {
+    const modeSummary = mode === 'solo' ? 'Solo' : '2 Players';
+    const difficultySummary = difficulty.charAt(0).toUpperCase() + difficulty.slice(1);
+    return (
+      <GamePreStart
+        gameId="hangman"
+        gameName="Hangman"
+        description={`${modeSummary} mode. ${difficultySummary} difficulty.`}
+        onStart={() => setStarted(true)}
+      >
+        <PuzzleSetupOptions
+          difficulty={difficulty}
+          mode={mode}
+          onDifficultyChange={setDifficulty}
+          onModeChange={setMode}
+        />
+      </GamePreStart>
+    );
+  }
 
   if (stage === 'secret-entry') {
     return (

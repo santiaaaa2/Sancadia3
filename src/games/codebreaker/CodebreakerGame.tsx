@@ -1,8 +1,11 @@
 import { useCallback, useEffect, useId, useMemo, useRef, useState } from 'react';
 import Button from '@/components/Button';
 import Card from '@/components/Card';
+import GamePreStart from '@/components/GamePreStart';
+import GameSettingsButton from '@/components/GameSettingsButton';
 import GameOverDialog from '@/components/GameOverDialog';
 import PassDeviceScreen from '@/components/PassDeviceScreen';
+import PuzzleSetupOptions, { type PuzzlePlayerMode } from '@/components/PuzzleSetupOptions';
 import SecretEntry from '@/components/SecretEntry';
 import {
   consistentCandidates,
@@ -21,12 +24,13 @@ import { calculatePuzzlePoints } from '@/lib/points';
 import { useSoloSession } from '@/games/useSoloSession';
 
 type Difficulty = 'beginner' | 'professional' | 'expert';
-type PlayerMode = 'solo' | 'two-player';
+type PlayerMode = PuzzlePlayerMode;
 type Stage = 'secret-entry' | 'handoff' | 'playing';
 type HistoryEntry = { guess: CodebreakerGuess; feedback: ScoreFeedback };
 
 interface CodebreakerGameProps {
   gameId: string;
+  gameName: string;
   difficulty: Difficulty;
   onDifficultyChange: (difficulty: Difficulty) => void;
   config: CodebreakerConfig;
@@ -41,6 +45,7 @@ function feedbackDescription(feedback: ScoreFeedback): string {
 
 export default function CodebreakerGame({
   gameId,
+  gameName,
   difficulty,
   onDifficultyChange,
   config,
@@ -58,6 +63,7 @@ export default function CodebreakerGame({
   const instanceId = useId();
   const resultNumber = useRef(0);
   const [mode, setMode] = useState<PlayerMode>('solo');
+  const [started, setStarted] = useState(false);
   const [stage, setStage] = useState<Stage>('playing');
   const [secret, setSecret] = useState<CodebreakerGuess>([]);
   const [secretEntry, setSecretEntry] = useState('');
@@ -319,6 +325,26 @@ export default function CodebreakerGame({
     setStage('handoff');
   };
 
+  if (!started) {
+    const modeSummary = mode === 'solo' ? 'Solo' : '2 Players';
+    const difficultySummary = difficulty.charAt(0).toUpperCase() + difficulty.slice(1);
+    return (
+      <GamePreStart
+        gameId={gameId}
+        gameName={gameName}
+        description={`${modeSummary} mode. ${difficultySummary} difficulty.`}
+        onStart={() => setStarted(true)}
+      >
+        <PuzzleSetupOptions
+          difficulty={difficulty}
+          mode={mode}
+          onDifficultyChange={onDifficultyChange}
+          onModeChange={setMode}
+        />
+      </GamePreStart>
+    );
+  }
+
   if (stage === 'secret-entry') {
     return (
       <SecretEntry
@@ -383,7 +409,7 @@ export default function CodebreakerGame({
               <option value="expert">Expert</option>
             </select>
           </label>
-          <div className="flex gap-2">
+          <div className="flex flex-wrap items-center gap-2">
             <Button
               aria-pressed={mode === 'solo'}
               variant={mode === 'solo' ? 'primary' : 'secondary'}
@@ -398,6 +424,7 @@ export default function CodebreakerGame({
             >
               2 Players
             </Button>
+            {history.length === 0 && <GameSettingsButton gameId={gameId} />}
           </div>
           {showSymbolToggle && (
             <label className="flex items-center gap-2 text-sm text-subtle">

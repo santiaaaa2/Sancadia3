@@ -11,6 +11,7 @@ import GomokuMatch from '@/games/gomoku/GomokuMatch';
 import HangmanGame from '@/games/hangman/HangmanGame';
 import MastermindGame from '@/games/mastermind/MastermindGame';
 import TicTacToeGame from '@/games/tictactoe/TicTacToeGame';
+import MatchSetup from '@/components/MatchSetup';
 
 function renderWithProviders(children: ReactNode) {
   return render(
@@ -27,7 +28,36 @@ async function startTwoPlayerGame(user: ReturnType<typeof userEvent.setup>) {
   await user.click(screen.getByRole('button', { name: 'Start game' }));
 }
 
+async function startPuzzleGame(user: ReturnType<typeof userEvent.setup>) {
+  await user.click(screen.getByRole('button', { name: 'Start game' }));
+}
+
 describe('game screens', () => {
+  it('starts the shared pre-game with the selected mode and difficulty', async () => {
+    const user = userEvent.setup();
+    const onStart = vi.fn();
+    renderWithProviders(<MatchSetup onStart={onStart} />);
+
+    await user.click(screen.getByRole('radio', { name: '2 Players' }));
+    await user.click(screen.getByRole('button', { name: 'Start game' }));
+
+    expect(onStart).toHaveBeenCalledWith({ mode: 'two-player' });
+  });
+
+  it('shows the online placeholder from shared pre-game setup', async () => {
+    const user = userEvent.setup();
+    const onStart = vi.fn();
+    renderWithProviders(<MatchSetup onStart={onStart} />);
+
+    const goLive = screen.getByRole('button', { name: 'GO LIVE — online play' });
+    expect(goLive.className).toContain('bg-online-accent');
+    expect(goLive.className).toContain('w-full');
+    await user.click(goLive);
+
+    expect(screen.getByRole('status').textContent).toBe('Online play coming soon');
+    expect(onStart).not.toHaveBeenCalled();
+  });
+
   it('Noughts and Crosses accepts a move and Restart clears the board', async () => {
     const user = userEvent.setup();
     renderWithProviders(<TicTacToeGame />);
@@ -76,6 +106,7 @@ describe('game screens', () => {
     const user = userEvent.setup();
     renderWithProviders(<MastermindGame />);
 
+    await startPuzzleGame(user);
     await user.click(screen.getByRole('button', { name: 'Submit guess' }));
     expect(screen.getByText('Guess must contain 4 symbols.')).toBeTruthy();
 
@@ -94,6 +125,7 @@ describe('game screens', () => {
     const user = userEvent.setup();
     renderWithProviders(<MastermindGame />);
 
+    await startPuzzleGame(user);
     for (let index = 0; index < 4; index += 1) {
       await user.click(screen.getByRole('button', { name: 'Add colour A' }));
     }
@@ -108,6 +140,7 @@ describe('game screens', () => {
     const user = userEvent.setup();
     renderWithProviders(<BullsCowsGame />);
 
+    await startPuzzleGame(user);
     await user.click(screen.getByRole('button', { name: 'Add digit 0' }));
     await user.click(screen.getByRole('button', { name: 'Add digit 0' }));
     await user.click(screen.getByRole('button', { name: 'Add digit 1' }));
@@ -125,6 +158,7 @@ describe('game screens', () => {
   it('Hangman exposes an on-screen keyboard, supports physical keys, and masks its word', async () => {
     const user = userEvent.setup();
     renderWithProviders(<HangmanGame />);
+    await startPuzzleGame(user);
     expect(screen.getByRole('button', { name: 'A' })).toBeTruthy();
     const maskedWord = screen.getByRole('group', { name: /Masked word:/ });
     expect(maskedWord).toBeTruthy();
@@ -139,6 +173,7 @@ describe('game screens', () => {
     const user = userEvent.setup();
     try {
       renderWithProviders(<HangmanGame />);
+      await startPuzzleGame(user);
       await user.click(screen.getByRole('button', { name: /Reveal a letter/ }));
       for (const letter of ['R', 'E', 'A', 'D']) {
         await user.click(screen.getByRole('button', { name: letter }));
@@ -153,6 +188,7 @@ describe('game screens', () => {
     const user = userEvent.setup();
     renderWithProviders(<HangmanGame />);
     await user.click(screen.getByRole('button', { name: '2 Players' }));
+    await startPuzzleGame(user);
     const secret = screen.getByLabelText('Player 1 secret word');
     await user.type(secret, 'word1');
     await user.click(screen.getByRole('button', { name: 'Confirm secret' }));

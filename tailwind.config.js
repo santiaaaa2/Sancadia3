@@ -17,7 +17,14 @@ export default {
           foreground: token('primary-foreground'),
           soft: token('primary-soft'),
         },
-        accent: token('accent'),
+        accent: {
+          DEFAULT: token('accent'),
+          subtle: token('subtle'),
+        },
+        online: {
+          accent: token('online-accent'),
+          'accent-foreground': token('online-accent-foreground'),
+        },
         danger: {
           DEFAULT: token('danger'),
           foreground: token('danger-foreground'),

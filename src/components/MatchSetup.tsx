@@ -1,11 +1,13 @@
 import { useState } from 'react';
 import { Bot, Users } from 'lucide-react';
 import Button from '@/components/Button';
-import Card from '@/components/Card';
+import GamePreStart from '@/components/GamePreStart';
 import SegmentedControl from '@/components/SegmentedControl';
 import { useSettings } from '@/hooks/useSettings';
 import { difficultyOptions } from '@/lib/difficultyOptions';
 import type { MatchConfig } from '@/games/matchConfig';
+import { games } from '@/games/registry';
+import { useParams } from 'react-router-dom';
 
 type Opponent = 'computer' | 'two-player';
 type Order = 'first' | 'second';
@@ -22,9 +24,12 @@ const orderOptions = [
 
 export default function MatchSetup({ onStart }: { onStart: (config: MatchConfig) => void }) {
   const { settings } = useSettings();
+  const { gameId } = useParams();
+  const gameName = games.find((game) => game.id === gameId)?.name;
   const [opponent, setOpponent] = useState<Opponent>('computer');
   const [order, setOrder] = useState<Order>('first');
   const [difficulty, setDifficulty] = useState(settings.difficulty);
+  const [onlineMessage, setOnlineMessage] = useState('');
 
   const start = () => {
     if (opponent === 'two-player') {
@@ -34,52 +39,69 @@ export default function MatchSetup({ onStart }: { onStart: (config: MatchConfig)
     onStart({ mode: 'computer', humanFirst: order === 'first', difficulty });
   };
 
+  const onGoLive = () => setOnlineMessage('Online play coming soon');
+  const startDescription =
+    opponent === 'computer'
+      ? `Vs Computer mode. ${difficultyOptions.find((option) => option.value === difficulty)?.label ?? difficulty} difficulty. You go ${order === 'first' ? 'first' : 'second'}.`
+      : `2 Players mode. Computer difficulty ${difficultyOptions.find((option) => option.value === difficulty)?.label ?? difficulty} is selected but not used in 2 Players mode.`;
+
   return (
-    <div className="flex flex-1 flex-col gap-6">
-      <Card className="grid gap-6">
-        <div>
-          <p className="mb-2 flex items-center gap-2 text-sm font-semibold text-subtle">
-            <Users className="h-4 w-4" aria-hidden="true" />
-            Players
+    <GamePreStart
+      gameId={gameId}
+      gameName={gameName}
+      description={startDescription}
+      onStart={start}
+    >
+      <div>
+        <p className="mb-2 flex items-center gap-2 text-sm font-semibold text-subtle">
+          <Users className="h-4 w-4" aria-hidden="true" />
+          Players
+        </p>
+        <SegmentedControl
+          label="Players"
+          options={opponentOptions}
+          value={opponent}
+          onChange={setOpponent}
+        />
+        <Button
+          aria-label="GO LIVE — online play"
+          className="mt-3 w-full bg-online-accent text-online-accent-foreground shadow-sm hover:brightness-95"
+          onClick={onGoLive}
+        >
+          GO LIVE
+        </Button>
+        {onlineMessage && (
+          <p role="status" className="mt-2 text-sm text-subtle">
+            {onlineMessage}
           </p>
-          <SegmentedControl
-            label="Players"
-            options={opponentOptions}
-            value={opponent}
-            onChange={setOpponent}
-          />
-        </div>
-
-        {opponent === 'computer' && (
-          <>
-            <div>
-              <p className="mb-2 text-sm font-semibold text-subtle">Who goes first</p>
-              <SegmentedControl
-                label="Who goes first"
-                options={orderOptions}
-                value={order}
-                onChange={setOrder}
-              />
-            </div>
-            <div>
-              <p className="mb-2 flex items-center gap-2 text-sm font-semibold text-subtle">
-                <Bot className="h-4 w-4" aria-hidden="true" />
-                Computer difficulty
-              </p>
-              <SegmentedControl
-                label="Computer difficulty"
-                options={difficultyOptions}
-                value={difficulty}
-                onChange={setDifficulty}
-              />
-            </div>
-          </>
         )}
-      </Card>
+      </div>
 
-      <Button className="mt-auto" onClick={start}>
-        Start game
-      </Button>
-    </div>
+      {opponent === 'computer' && (
+        <>
+          <div>
+            <p className="mb-2 text-sm font-semibold text-subtle">Who goes first</p>
+            <SegmentedControl
+              label="Who goes first"
+              options={orderOptions}
+              value={order}
+              onChange={setOrder}
+            />
+          </div>
+          <div>
+            <p className="mb-2 flex items-center gap-2 text-sm font-semibold text-subtle">
+              <Bot className="h-4 w-4" aria-hidden="true" />
+              Computer difficulty
+            </p>
+            <SegmentedControl
+              label="Computer difficulty"
+              options={difficultyOptions}
+              value={difficulty}
+              onChange={setDifficulty}
+            />
+          </div>
+        </>
+      )}
+    </GamePreStart>
   );
 }

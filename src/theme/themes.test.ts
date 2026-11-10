@@ -24,11 +24,15 @@ describe('theme contrast', () => {
     const { tokens } = theme;
     const pairs: Array<[string, string]> = [
       [tokens.foreground, tokens.background],
+      [tokens.foreground, tokens.surface],
       [tokens.subtle, tokens.background],
+      [tokens.subtle, tokens.surface],
       [tokens.primary, tokens.background],
       [tokens.accent, tokens.background],
+      [tokens['online-accent-foreground'], tokens['online-accent']],
       [tokens.danger, tokens.background],
       [tokens['primary-foreground'], tokens.primary],
+      [tokens['primary-foreground'], tokens['primary-hover']],
       [tokens['danger-foreground'], tokens.danger],
       [tokens.primary, tokens['primary-soft']],
     ];
