@@ -1,12 +1,20 @@
 import type { Difficulty } from '@/engine/difficulty';
 import { aiRegistry, type WorkerGameId } from '@/games/aiRegistry';
 
-interface WorkerRequest {
+interface WorkerSearchRequest {
+  type: 'search';
   requestId: number;
   gameId: WorkerGameId;
   state: unknown;
   difficulty: Difficulty;
 }
+
+interface WorkerCancelRequest {
+  type: 'cancel';
+  requestId: number;
+}
+
+type WorkerRequest = WorkerSearchRequest | WorkerCancelRequest;
 
 interface WorkerResponse {
   requestId: number;
@@ -16,6 +24,7 @@ interface WorkerResponse {
 
 interface PendingRequest {
   requestId: number;
+  gameId: WorkerGameId;
   resolve: (move: unknown | null) => void;
   reject: (error: Error) => void;
   signal?: AbortSignal;
@@ -41,13 +50,24 @@ function clearPending(request: PendingRequest): void {
 }
 
 function cancelPending(): void {
-  if (pending) {
-    const request = pending;
-    clearPending(request);
-    request.reject(new AIRequestCancelledError());
+  if (!pending) return;
+  const request = pending;
+  clearPending(request);
+  if (aiRegistry[request.gameId]?.supportsCancellation && worker) {
+    try {
+      worker.postMessage({
+        type: 'cancel',
+        requestId: request.requestId,
+      } satisfies WorkerCancelRequest);
+    } catch {
+      worker.terminate();
+      worker = null;
+    }
+  } else {
+    worker?.terminate();
+    worker = null;
   }
-  worker?.terminate();
-  worker = null;
+  request.reject(new AIRequestCancelledError());
 }
 
 function getWorker(): Worker | null {
@@ -96,21 +116,20 @@ export function requestMove<State, Move>(
     if (gameId === 'latrunculi') {
       return Promise.reject(new Error('LATRUNCULI requires Web Worker support for AI searches.'));
     }
-    try {
-      const move = entry.findMove(state, difficulty);
+    return Promise.resolve(entry.findMove(state, difficulty, signal)).then((move) => {
+      if (signal?.aborted) throw new AIRequestCancelledError();
       if (move !== null && !entry.isLegalMove(state, move)) {
-        return Promise.reject(new Error(`AI returned an illegal move for ${gameId}`));
+        throw new Error(`AI returned an illegal move for ${gameId}`);
       }
-      return Promise.resolve(move as Move | null);
-    } catch (error) {
-      return Promise.reject(error);
-    }
+      return move as Move | null;
+    });
   }
 
   const requestId = ++nextRequestId;
   return new Promise<Move | null>((resolve, reject) => {
     const request: PendingRequest = {
       requestId,
+      gameId,
       resolve: (move) => resolve(move as Move | null),
       reject,
       signal,
@@ -124,7 +143,7 @@ export function requestMove<State, Move>(
     }
     pending = request;
 
-    const message: WorkerRequest = { requestId, gameId, state, difficulty };
+    const message: WorkerRequest = { type: 'search', requestId, gameId, state, difficulty };
     try {
       activeWorker.postMessage(message);
     } catch (error) {
@@ -137,5 +156,10 @@ export function requestMove<State, Move>(
 }
 
 export function cancelAiRequest(): void {
-  cancelPending();
+  if (pending) {
+    cancelPending();
+    return;
+  }
+  worker?.terminate();
+  worker = null;
 }

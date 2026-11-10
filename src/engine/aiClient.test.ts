@@ -127,10 +127,36 @@ describe('AI worker client', () => {
     expect(ticTacToe.legalMoves(state)).toContain(move);
   });
 
-  it('each registered game produces a legal beginner move', () => {
-    for (const entry of Object.values(aiRegistry)) {
+  it('sends cooperative cancellation to searches that support it', async () => {
+    vi.stubGlobal('Worker', MockWorker);
+    const entry = aiRegistry['noughts-and-crosses'];
+    const supportsCancellation = entry.supportsCancellation;
+    entry.supportsCancellation = true;
+    try {
+      const controller = new AbortController();
+      const request = requestMove<TicTacToeState, number>(
+        'noughts-and-crosses',
+        ticTacToe.initialState(),
+        'beginner',
+        controller.signal,
+      );
+      const worker = MockWorker.instances[0];
+      expect(worker).toBeDefined();
+      if (!worker) throw new Error('Expected a worker to be created.');
+
+      controller.abort();
+      await expect(request).rejects.toBeInstanceOf(AIRequestCancelledError);
+      expect(worker.terminated).toBe(false);
+      expect(worker.messages[1]).toMatchObject({ type: 'cancel' });
+    } finally {
+      entry.supportsCancellation = supportsCancellation;
+    }
+  });
+
+  it('each registered game produces a legal beginner move', async () => {
+    for (const entry of Object.values(aiRegistry).filter((candidate) => candidate.available)) {
       const state = entry.initialState();
-      const move = entry.findMove(state, 'beginner');
+      const move = await entry.findMove(state, 'beginner');
       expect(move).not.toBeNull();
       expect(entry.isLegalMove(state, move)).toBe(true);
     }

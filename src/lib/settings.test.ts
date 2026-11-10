@@ -90,6 +90,42 @@ describe('settings persistence', () => {
     ).toBe(SETTINGS_VERSION);
   });
 
+  it('migrates version 5 preferences and keeps per-game settings', () => {
+    const stored = {
+      version: 5,
+      nation: 'china',
+      useWesternSymbols: true,
+      gameSettings: { gomoku: DEFAULT_GAME_SETTINGS },
+    };
+
+    expect(parseSettings(stored)).toMatchObject({
+      nation: 'china',
+      useWesternSymbols: true,
+      gameSettings: { gomoku: DEFAULT_GAME_SETTINGS },
+    });
+  });
+
+  it('migrates version 6 settings and safely validates per-game zoom levels', () => {
+    expect(
+      parseSettings({
+        version: 6,
+        nation: 'china',
+        boardZoomLevels: { senet: 2 },
+      }).boardZoomLevels,
+    ).toEqual({});
+
+    expect(
+      parseSettings({
+        version: SETTINGS_VERSION,
+        boardZoomLevels: {
+          seega: 1.5,
+          senet: 9,
+          malformed: 'zoom',
+        },
+      }).boardZoomLevels,
+    ).toEqual({ seega: 1.5, senet: 1, malformed: 1 });
+  });
+
   it('persists and validates game-specific settings independently of global settings', () => {
     const gameSettings: typeof DEFAULT_SETTINGS.gameSettings = {
       checkers: {

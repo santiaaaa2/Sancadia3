@@ -76,7 +76,7 @@ This section captures the Holland-specific prompt tasks from the attached game a
 - [x] Review the Dutch classics set and map each title to the app's existing game patterns.
 - [x] Implement Stratego in the app's UI and rules flow.
 - [x] Implement Sjoelen (Dutch shuffleboard) with a matching board interaction and scoring flow.
-- [ ] Implement Ganzenbord (The Game of the Goose) with the goose bonuses and landing rules.
+- [x] Implement Ganzenbord (The Game of the Goose) with the goose bonuses and landing rules.
 - [ ] Implement Mens Erger Je Niet with the race-and-capture loop and safe-zone logic.
 - [ ] Implement Trictrac (Dutch Backgammon variant) with the board, move rules, and bearing-off flow.
 - [ ] Implement Levensweg (The Game of Life - Dutch Edition) using the app's board-game conventions.

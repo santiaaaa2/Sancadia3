@@ -25,6 +25,20 @@ Use this checklist when adding a game:
    Use symbols as well as color to distinguish players, and test at a 360px viewport.
 9. Run `npm run check` and `npm run build`.
 
+## Custom search and hidden-information games
+
+Use the optional `searchOverride` on a worker AI entry when the search does not fit the shared
+two-player minimax implementation, such as Monte Carlo tree search. The override receives the
+state, difficulty, time limit and an `AbortSignal`; long searches must yield to the worker event
+loop periodically and check `signal.aborted` inside the search loop. Keep it in the existing
+`ai.worker.ts` path so cancellation and legal-move verification remain consistent.
+
+Use `HiddenGameEngine` when a game has more than two seats or needs an explicit player-specific
+observation. It supports two to six players. An engine for a public-information multiplayer game
+may return the full state from `observe`; hidden-information games must return only information
+that player is allowed to see, and every AI must consume that observation rather than full state.
+Add contract and information-leak tests before connecting the game to any UI or backend flow.
+
 ## Adding a puzzle game
 
 Puzzle games do not use the minimax engine or `aiRegistry`.
@@ -41,3 +55,23 @@ Puzzle games do not use the minimax engine or `aiRegistry`.
 6. Make keyboard input, touch controls, feedback announcements, and result dialogs usable without
    relying on color alone. Verify the layout at 360px wide.
 7. Add component tests and run `npm run check` and `npm run build`.
+
+## Games with zoomable boards and stick dice
+
+Use `ZoomableBoard` for boards whose cells become difficult to target at a 360px viewport.
+Keep the turn banner, score, and action controls outside the pan area. Pass the game's `gameId`,
+row and column counts, and board content; use the reported fit-cell size to enable tap-preview and
+confirm when the cells are below 44px. The wrapper persists zoom per game, supports Fit and discrete
+zoom levels, clamps panning, and disables page touch scrolling while the board is being manipulated.
+For irregular boards, size the SVG to the wrapper's board area and provide generous, separately
+labelled hit targets.
+
+Use `rollSticks` from `src/engine/hidden/sticks.ts` for four independent two-sided sticks. Pass the
+game's injected random-number generator; never call `Math.random()` from a rules module. Use
+`stickProbabilities()` when an AI needs the binomial distribution for expectimax. Keep each game's
+mapping from marked sides to movement, extra throws, and special-square effects in that game's
+ruleset rather than in the shared helper.
+
+Games based on incomplete historical evidence must carry a `reconstructionNote` in their registry
+entry and show the `ReconstructedRulesBadge` in the game card. Keep reconstruction choices in the
+game ruleset and distinguish them from known historical facts in the info dialog.

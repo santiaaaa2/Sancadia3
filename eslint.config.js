@@ -50,4 +50,22 @@ export default tseslint.config(
       ],
     },
   },
+  {
+    files: ['src/games/{xiangqi,go,chinesecheckers,luzhanqi,mahjong}/{rules,ai}.ts'],
+    rules: {
+      'no-restricted-properties': [
+        'error',
+        {
+          object: 'Math',
+          property: 'random',
+          message: 'Use an injected random source so game logic is deterministic in tests.',
+        },
+        {
+          object: 'Date',
+          property: 'now',
+          message: 'Use an injected clock so game logic is deterministic in tests.',
+        },
+      ],
+    },
+  },
 );

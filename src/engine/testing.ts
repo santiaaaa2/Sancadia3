@@ -1,4 +1,5 @@
 import { expect } from 'vitest';
+import type { HiddenGameEngine, HiddenPlayer } from '@/engine/hidden';
 import type { GameEngine } from '@/engine/types';
 
 const RANDOM_GAMES = 200;
@@ -72,6 +73,70 @@ export function runEngineContract<State, Move>(engine: GameEngine<State, Move>):
     expect(
       engine.isTerminal(state),
       `${engine.id}: random game ${game + 1} did not terminate within ${MAX_PLAYOUT_TURNS} turns`,
+    ).toBe(true);
+    expect(engine.winner(state), `${engine.id}: terminal winner`).not.toBeNull();
+  }
+}
+
+export function runHiddenGameContract<State, Move, Observation>(
+  engine: HiddenGameEngine<State, Move, Observation>,
+): void {
+  const initialState = engine.initialState();
+  const playerCount = engine.playerCount(initialState);
+
+  expect(playerCount, `${engine.id}: player count must be between 2 and 6`).toBeGreaterThanOrEqual(
+    2,
+  );
+  expect(playerCount, `${engine.id}: player count must be between 2 and 6`).toBeLessThanOrEqual(6);
+  expect(
+    engine.isTerminal(initialState),
+    `${engine.id}: initial state should not be terminal`,
+  ).toBe(false);
+  expect(
+    engine.legalMoves(initialState).length,
+    `${engine.id}: initial legal moves`,
+  ).toBeGreaterThan(0);
+  expect(engine.winner(initialState), `${engine.id}: non-terminal winner`).toBeNull();
+
+  for (let player = 0; player < playerCount; player++) {
+    const observation = engine.observe(deepFreeze(initialState), player as HiddenPlayer);
+    expect(observation, `${engine.id}: player ${player} must receive an observation`).toBeDefined();
+  }
+
+  for (const move of engine.legalMoves(initialState)) {
+    expect(
+      () => engine.applyMove(deepFreeze(initialState), move),
+      `${engine.id}: applyMove`,
+    ).not.toThrow();
+  }
+
+  for (let game = 0; game < RANDOM_GAMES; game++) {
+    let state = engine.initialState();
+    let plies = 0;
+    while (!engine.isTerminal(state) && plies < MAX_PLAYOUT_TURNS) {
+      const count = engine.playerCount(state);
+      expect(count, `${engine.id}: invalid player count during play`).toBeGreaterThanOrEqual(2);
+      expect(count, `${engine.id}: invalid player count during play`).toBeLessThanOrEqual(6);
+      const current = engine.currentPlayer(state);
+      expect(current, `${engine.id}: current player must be seated`).toBeGreaterThanOrEqual(0);
+      expect(current, `${engine.id}: current player must be seated`).toBeLessThan(count);
+      expect(engine.winner(state), `${engine.id}: non-terminal winner`).toBeNull();
+      const moves = engine.legalMoves(state);
+      expect(
+        moves.length,
+        `${engine.id}: non-terminal state must have a legal move`,
+      ).toBeGreaterThan(0);
+      const move = moves[randomIndex(moves.length)];
+      if (move === undefined) {
+        throw new Error(`${engine.id}: random move selection returned no move.`);
+      }
+      state = engine.applyMove(deepFreeze(state), move);
+      plies++;
+    }
+
+    expect(
+      engine.isTerminal(state),
+      `${engine.id}: random game ${game + 1} did not terminate within ${MAX_PLAYOUT_TURNS} plies`,
     ).toBe(true);
     expect(engine.winner(state), `${engine.id}: terminal winner`).not.toBeNull();
   }

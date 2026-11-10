@@ -1,5 +1,6 @@
 import { BookOpen } from 'lucide-react';
 import { useNavigate, Link } from 'react-router-dom';
+import ReconstructedRulesBadge from '@/components/ReconstructedRulesBadge';
 import type { GameInfo } from '@/games/registry';
 
 interface GameCardProps {
@@ -55,6 +56,13 @@ export default function GameCard({ game }: GameCardProps) {
         <div aria-disabled="true" className="flex min-w-0 flex-1 items-center gap-4 pb-12 pr-2">
           {content}
         </div>
+      )}
+      {game.reconstructionNote && (
+        <ReconstructedRulesBadge
+          gameName={game.name}
+          note={game.reconstructionNote}
+          className="absolute bottom-2 left-2"
+        />
       )}
       <button
         type="button"

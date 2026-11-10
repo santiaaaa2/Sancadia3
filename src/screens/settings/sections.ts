@@ -306,6 +306,13 @@ export const settingsSections: readonly SettingsSectionDefinition[] = [
       },
       {
         type: 'toggle',
+        key: 'useWesternSymbols',
+        label: 'Show Western symbols instead of Chinese characters',
+        description: 'Use Western text labels on traditional Chinese game pieces.',
+        status: 'active',
+      },
+      {
+        type: 'toggle',
         key: 'confirmMove',
         label: 'Confirm move button',
         description: 'Ask for confirmation before submitting a move.',

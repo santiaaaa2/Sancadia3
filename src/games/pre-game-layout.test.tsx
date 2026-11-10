@@ -13,6 +13,7 @@ const gamesWithSetup = new Set([
   'gomoku',
   'reversi',
   'checkers',
+  'xiangqi',
   'battleships',
   'mastermind',
   'bullscows',

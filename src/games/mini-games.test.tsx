@@ -10,6 +10,7 @@ const games = [
   ['dots-and-boxes', 'button', /Horizontal line/],
   ['mancala', 'button', /Player 1 pit 1/],
   ['ludo', 'button', 'Roll die'],
+  ['ganzenbord', 'grid', 'Ganzenbord board'],
   ['snake', 'button', 'Start'],
   ['2048', 'grid', '2048 game board'],
   ['minesweeper', 'grid', 'Minesweeper board'],

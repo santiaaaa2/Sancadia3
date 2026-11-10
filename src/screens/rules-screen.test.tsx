@@ -41,6 +41,42 @@ describe('How to play rules', () => {
     expect(screen.queryByRole('heading', { name: 'Setup for connect-4' })).toBeNull();
   });
 
+  it('filters the game list to the Traditional Chinese group', async () => {
+    const user = userEvent.setup();
+    renderRulesApp();
+
+    await user.selectOptions(screen.getByRole('combobox', { name: 'Game group' }), 'chinese');
+
+    expect(screen.getByRole('heading', { name: 'Traditional Chinese', level: 3 })).toBeTruthy();
+    expect(screen.getByRole('button', { name: 'How to play Xiangqi' })).toBeTruthy();
+    expect(screen.queryByRole('button', { name: 'How to play Connect 4' })).toBeNull();
+  });
+
+  it('lists the Egyptian games and explains that reconstructed rules are modern choices', async () => {
+    const user = userEvent.setup();
+    renderRulesApp();
+
+    await user.selectOptions(screen.getByRole('combobox', { name: 'Game group' }), 'egyptian');
+
+    expect(screen.getByRole('heading', { name: 'Ancient Egypt', level: 3 })).toBeTruthy();
+    for (const gameName of [
+      'Seega',
+      'Egyptian Mancala',
+      'Senet',
+      'The Game of 20 Squares',
+      'Hounds and Jackals',
+      'Mehen',
+    ]) {
+      expect(screen.getByRole('button', { name: `How to play ${gameName}` })).toBeTruthy();
+    }
+
+    await user.click(screen.getByRole('button', { name: 'About reconstructed rules for Senet' }));
+    expect(
+      screen.getByRole('heading', { name: 'Senet: Reconstructed rules', level: 2 }),
+    ).toBeTruthy();
+    expect(screen.getByText(/original rules were not preserved/i)).toBeTruthy();
+  });
+
   it('serves a direct rules URL and keeps Play enabled for an available game', () => {
     renderRulesApp('/games/mancala/rules');
 
@@ -58,7 +94,9 @@ describe('How to play rules', () => {
     await user.click(screen.getByRole('button', { name: 'How to play Minesweeper' }));
 
     expect(screen.getByRole('heading', { name: 'Minesweeper Rules', level: 1 })).toBeTruthy();
-    expect((screen.getByRole('button', { name: /Play/ }) as HTMLButtonElement).disabled).toBe(false);
+    expect((screen.getByRole('button', { name: /Play/ }) as HTMLButtonElement).disabled).toBe(
+      false,
+    );
   });
 
   it('renders readable rule sections at a 360px viewport', () => {

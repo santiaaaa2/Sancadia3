@@ -8,6 +8,18 @@ export type RulesGameId =
   | 'latrunculi'
   | 'stratego'
   | 'sjoelen'
+  | 'ganzenbord'
+  | 'seega'
+  | 'egyptianmancala'
+  | 'senet'
+  | 'twentysquares'
+  | 'houndsjackals'
+  | 'mehen'
+  | 'xiangqi'
+  | 'go'
+  | 'chinesecheckers'
+  | 'luzhanqi'
+  | 'mahjong'
   | 'checkers'
   | 'battleships'
   | 'mastermind'
@@ -33,6 +45,90 @@ export interface GameRules {
 }
 
 export const rulesContent = {
+  seega: {
+    title: 'Seega',
+    goal: 'Capture all of your opponent’s stones or leave them unable to move.',
+    setup: 'A 5-by-5 board with 12 stones per player is planned; the centre starts empty.',
+    howToPlay: ['Place stones in the setup phase, then move and capture by sandwiching.'],
+    winning: 'The full rules and playable game are coming soon.',
+    specialRules: ['The board is not playable yet.'],
+    difficultyNotes: {
+      beginner: 'Coming soon.',
+      professional: 'Coming soon.',
+      expert: 'Coming soon.',
+    },
+    tips: ['Check back when the game is released.'],
+  },
+  egyptianmancala: {
+    title: 'Egyptian Mancala',
+    goal: 'Finish with more captured pebbles than your opponent.',
+    setup: 'Two rows of six pits without stores are planned; the game is not playable yet.',
+    howToPlay: ['Pick up pebbles from one of your pits and sow them around the board.'],
+    winning: 'The full rules and playable game are coming soon.',
+    specialRules: ['The board is not playable yet.'],
+    difficultyNotes: {
+      beginner: 'Coming soon.',
+      professional: 'Coming soon.',
+      expert: 'Coming soon.',
+    },
+    tips: ['Check back when the game is released.'],
+  },
+  senet: {
+    title: 'Senet',
+    goal: 'Race all five of your pieces off the board.',
+    setup: 'A 30-square serpentine path is planned; this is a modern reconstruction.',
+    howToPlay: ['Throw four two-sided sticks, then move a legal piece by the resulting count.'],
+    winning: 'The full rules and playable game are coming soon.',
+    specialRules: ['Historical rules are incomplete; the reconstruction will be configurable.'],
+    difficultyNotes: {
+      beginner: 'Coming soon.',
+      professional: 'Coming soon.',
+      expert: 'Coming soon.',
+    },
+    tips: ['Check back when the game is released.'],
+  },
+  twentysquares: {
+    title: 'The Game of 20 Squares',
+    goal: 'Race all seven of your pieces along the route and bear them off.',
+    setup: 'A shared 20-square route is planned; this is a modern reconstruction.',
+    howToPlay: ['Throw four two-sided sticks, then move a legal piece by the resulting count.'],
+    winning: 'The full rules and playable game are coming soon.',
+    specialRules: ['Historical rules are incomplete; the reconstruction will be configurable.'],
+    difficultyNotes: {
+      beginner: 'Coming soon.',
+      professional: 'Coming soon.',
+      expert: 'Coming soon.',
+    },
+    tips: ['Check back when the game is released.'],
+  },
+  houndsjackals: {
+    title: 'Hounds and Jackals (58 Holes)',
+    goal: 'Race all five of your pegs to the exit.',
+    setup: 'A 58-hole board is planned; the chosen layout and shortcut rules need to be sourced.',
+    howToPlay: ['Throw four two-sided sticks, then move a peg along its track.'],
+    winning: 'The full rules and playable game are coming soon.',
+    specialRules: ['The reconstruction will be clearly labelled and configurable.'],
+    difficultyNotes: {
+      beginner: 'Coming soon.',
+      professional: 'Coming soon.',
+      expert: 'Coming soon.',
+    },
+    tips: ['Check back when the game is released.'],
+  },
+  mehen: {
+    title: 'Mehen',
+    goal: 'Move your marbles and lion along the coiled-snake track.',
+    setup: 'A configurable coiled track is planned; this is a modern reconstruction.',
+    howToPlay: ['Throw four two-sided sticks, then move one eligible piece.'],
+    winning: 'The full rules and playable game are coming soon.',
+    specialRules: ['Historical rules are not preserved; the reconstruction will be configurable.'],
+    difficultyNotes: {
+      beginner: 'Coming soon.',
+      professional: 'Coming soon.',
+      expert: 'Coming soon.',
+    },
+    tips: ['Check back when the game is released.'],
+  },
   'noughts-and-crosses': {
     title: 'Noughts and Crosses',
     goal: 'Make a line of three of your marks before your opponent does.',
@@ -101,6 +197,99 @@ export const rulesContent = {
       'Build from connected shapes instead of scattering stones.',
       'An open line with empty spaces at both ends is harder to block.',
     ],
+  },
+  xiangqi: {
+    title: 'Xiangqi (Chinese Chess)',
+    goal: 'Capture or trap the opposing general so the other side cannot make a legal move.',
+    setup:
+      'Play on a 9-by-10 board of intersections. Each side starts with 16 pieces; Red moves first. The river divides the two halves, and each general begins inside its own palace.',
+    howToPlay: [
+      'Take turns moving one piece along the board lines.',
+      'The general moves one point orthogonally inside its palace; advisors move one point diagonally there.',
+      'Elephants move two points diagonally on their own side of the river and cannot jump a blocked eye. Horses move two points along one axis and one across, but cannot jump a blocked leg.',
+      'Chariots move any unobstructed distance orthogonally. Cannons move the same way, but must jump exactly one piece to capture.',
+      'Soldiers move forward one point. After crossing the river, they may also move sideways, but never backward.',
+      'Choose a move that keeps your general safe. The two generals may not face each other on an open file.',
+    ],
+    winning:
+      'Checkmate the opposing general or leave the opposing side with no legal move. Stalemate is a loss, not a draw.',
+    specialRules: [
+      'A third occurrence of the same position is a draw unless one player has given check on every move in the repeated sequence; that player loses.',
+      'The game is drawn after 60 complete moves without a capture (120 plies) or after 400 plies.',
+    ],
+    difficultyNotes: {
+      beginner: 'Learn each piece’s movement, capture undefended pieces, and protect your general.',
+      professional:
+        'Coordinate chariots, cannons, and horses across the river while watching for checks.',
+      expert:
+        'Calculate forcing lines and repetition while preserving a safe route for your general.',
+    },
+    tips: [
+      'Pieces occupy intersections, not the spaces between board lines.',
+      'A cannon needs exactly one screen between it and a piece it captures.',
+      'Keep the file between the two generals blocked unless you are ready for a flying-general capture.',
+    ],
+  },
+  go: {
+    title: 'Go (Weiqi)',
+    goal: 'Finish with more surrounded territory than your opponent.',
+    setup: 'A two-player board with selectable sizes is planned; this game is not playable yet.',
+    howToPlay: ['Place one stone on an empty intersection, or pass.'],
+    winning: 'The game is scored by territory and stones on the board.',
+    specialRules: [
+      'Groups with no liberties are captured; suicide and repeated positions are illegal.',
+    ],
+    difficultyNotes: {
+      beginner: 'Build connected groups and avoid leaving stones without liberties.',
+      professional: 'Balance territory, influence, and the safety of your groups.',
+      expert: 'Use shape, timing, and life-and-death reading to maximize your score.',
+    },
+    tips: ['Corners and edges can be easier to surround than open center territory.'],
+  },
+  chinesecheckers: {
+    title: 'Chinese Checkers (Tiaoqi)',
+    goal: 'Move all of your marbles into the opposite triangle.',
+    setup:
+      'A six-pointed star board for two to six players is planned; this game is not playable yet.',
+    howToPlay: ['Move one marble to a neighboring hole or hop over another marble.'],
+    winning:
+      'The first player to fill the opposite triangle wins; the remaining players can continue for ranking.',
+    specialRules: ['A chain of hops is one move and can cross marbles belonging to any player.'],
+    difficultyNotes: {
+      beginner: 'Move marbles forward while keeping them close enough to help one another.',
+      professional: 'Use long hop chains and avoid leaving a slow straggler behind.',
+      expert: 'Plan routes through shared bridges while limiting your opponents’ best hops.',
+    },
+    tips: ['A friendly marble can be a useful stepping stone.'],
+  },
+  luzhanqi: {
+    title: 'Lu Zhan Qi (Army Chess)',
+    goal: 'Capture the opposing flag while protecting your own.',
+    setup: 'A hidden-army setup and board are planned; this game is not playable yet.',
+    howToPlay: ['Arrange your army, then move one eligible piece along the board paths.'],
+    winning: 'Capture the opposing flag or leave the opposing army without a legal move.',
+    specialRules: ['The referee resolves clashes; most enemy ranks remain hidden until revealed.'],
+    difficultyNotes: {
+      beginner: 'Keep your flag defended and use scouts to learn the enemy positions.',
+      professional: 'Protect key paths and send engineers to investigate suspected mines.',
+      expert: 'Track public clash information and reason about the remaining hidden ranks.',
+    },
+    tips: ['The pieces’ strength is hidden from the opponent.'],
+  },
+  mahjong: {
+    title: 'Mahjong',
+    goal: 'Complete a winning hand before the wall runs out.',
+    setup:
+      'A four-player, 136-tile Hong Kong-style ruleset is planned; this game is not playable yet.',
+    howToPlay: ['Draw and discard tiles, and claim eligible discards to build a hand.'],
+    winning: 'A standard hand uses four melds and a pair; several special hands are also planned.',
+    specialRules: ['Claims have a priority order, and a kong draws a replacement tile.'],
+    difficultyNotes: {
+      beginner: 'Collect matching sets and sequences while keeping a pair.',
+      professional: 'Use discards and exposed melds to evaluate hand potential.',
+      expert: 'Balance tile efficiency, likely waits, fan value, and safety.',
+    },
+    tips: ['Keep track of visible discards when choosing a wait.'],
   },
   reversi: {
     title: 'Reversi',
@@ -204,9 +393,12 @@ export const rulesContent = {
       'The flag and bomb are immobile and must be guarded from enemy attacks.',
     ],
     difficultyNotes: {
-      beginner: 'Keep your flag away from the front line and look for safe, supporting flips around enemy scouts.',
-      professional: 'Blend forward pressure with quiet protection so the flag is never left exposed.',
-      expert: 'Track hidden piece positions and attack patterns, then use your strongest pieces to force the enemy flag into the open.',
+      beginner:
+        'Keep your flag away from the front line and look for safe, supporting flips around enemy scouts.',
+      professional:
+        'Blend forward pressure with quiet protection so the flag is never left exposed.',
+      expert:
+        'Track hidden piece positions and attack patterns, then use your strongest pieces to force the enemy flag into the open.',
     },
     tips: [
       'Early scouts are good at probing the enemy without committing your heavier troops.',
@@ -234,11 +426,42 @@ export const rulesContent = {
     difficultyNotes: {
       beginner: 'Start by aiming for the middle, high-value lanes to build steady points.',
       professional: 'Balance the 4-point lane with the 2- and 3-point lanes to avoid empty slots.',
-      expert: 'Track the lane totals and chase the bonus by filling every lane before the round closes.',
+      expert:
+        'Track the lane totals and chase the bonus by filling every lane before the round closes.',
     },
     tips: [
       'A full set of lanes is worth more than a lucky spike in one category.',
       'The 4-point lane is valuable, but the set bonus matters if every lane is active.',
+    ],
+  },
+  ganzenbord: {
+    title: 'Ganzenbord (Game of the Goose)',
+    goal: 'Be the first player to reach space 63 exactly.',
+    setup:
+      'Two to four players share a 63-space winding track and take turns rolling one six-sided die. This app uses a clearly stated house-rule set for spaces whose effects vary between editions.',
+    howToPlay: [
+      'Roll the die and move forward by the number shown.',
+      'If a move would pass space 63, bounce backward by the extra spaces; you must land exactly on 63 to win.',
+      'Landing on a Goose space (9, 18, 27, 36, 45, or 54) moves you forward by the same die roll again.',
+      'The bridge on 6 advances to 12; the maze on 42 sends you back to 39; Death on 58 returns you to Start.',
+      'The inn on 19 costs one turn, while the well on 31 and prison on 52 each cost two turns; press Roll die to skip each missed turn.',
+    ],
+    winning: 'The first player to reach space 63 exactly wins.',
+    specialRules: [
+      'Overshooting the finish reflects the player backward from space 63.',
+      'This implementation uses fixed lost turns for the inn, well, and prison rather than a wait-until-rescued rule.',
+      'Special-space effects apply after Goose movement resolves.',
+    ],
+    difficultyNotes: {
+      beginner: 'Keep track of who is waiting and plan around the spaces that cost turns.',
+      professional:
+        'Remember that Goose spaces repeat the same die roll and can carry a player several spaces forward.',
+      expert:
+        'Use the bounce-back finish rule to anticipate how each possible roll affects the final approach.',
+    },
+    tips: [
+      'A Goose space repeats the number from the roll that brought you there.',
+      'Landing on a penalty space can cost more than the distance you gain.',
     ],
   },
   battleships: {

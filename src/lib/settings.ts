@@ -2,7 +2,7 @@ import type { Difficulty } from '@/engine/difficulty';
 import { isNationId, type NationId } from '@/games/nations';
 import { themes, type ThemeId } from '@/theme/themes';
 
-export const SETTINGS_VERSION = 5;
+export const SETTINGS_VERSION = 7;
 
 export type AnimationSpeed = 'off' | 'slow' | 'normal' | 'fast';
 export type ScreenOrientation = 'auto' | 'portrait' | 'landscape';
@@ -14,6 +14,7 @@ export type GameMode = 'computer' | 'two-player';
 export type GameTimeControl =
   '1-minute' | '3-minutes' | '5-minutes' | '15-minutes' | '1-day' | '3-days' | '7-days';
 export type GameChatMode = 'preset-reactions' | 'mute';
+export type BoardZoomLevel = 1 | 1.25 | 1.5 | 2;
 
 export interface GameSettings {
   speedAndMode: {
@@ -72,6 +73,7 @@ export interface Settings {
   showLegalMoveHighlights: boolean;
   showLastMoveMarker: boolean;
   showBoardCoordinates: boolean;
+  useWesternSymbols: boolean;
   confirmMove: boolean;
   autoFlipBoard: boolean;
   screenOrientation: ScreenOrientation;
@@ -87,6 +89,7 @@ export interface Settings {
   shareAnonymousUsage: boolean;
   graphicsQuality: GraphicsQuality;
   gameSettings: Record<string, GameSettings>;
+  boardZoomLevels: Record<string, BoardZoomLevel>;
 }
 
 const STORAGE_KEY = 'classic-games-arcade:settings';
@@ -114,6 +117,7 @@ export const DEFAULT_SETTINGS: Settings = {
   showLegalMoveHighlights: true,
   showLastMoveMarker: true,
   showBoardCoordinates: false,
+  useWesternSymbols: false,
   confirmMove: false,
   autoFlipBoard: false,
   screenOrientation: 'auto',
@@ -129,6 +133,7 @@ export const DEFAULT_SETTINGS: Settings = {
   shareAnonymousUsage: false,
   graphicsQuality: 'high',
   gameSettings: {},
+  boardZoomLevels: {},
 };
 
 export const DEFAULT_GAME_SETTINGS: GameSettings = {
@@ -175,6 +180,10 @@ function isThemeId(value: unknown): value is ThemeId {
 
 function isDifficulty(value: unknown): value is Difficulty {
   return value === 'beginner' || value === 'professional' || value === 'expert';
+}
+
+function isBoardZoomLevel(value: unknown): value is BoardZoomLevel {
+  return value === 1 || value === 1.25 || value === 1.5 || value === 2;
 }
 
 function isOneOf<const T extends readonly string[]>(
@@ -311,6 +320,15 @@ function parseGameSettingsMap(value: unknown): Record<string, GameSettings> {
   );
 }
 
+function parseBoardZoomLevels(value: unknown): Record<string, BoardZoomLevel> {
+  if (!isRecord(value)) return {};
+  return Object.fromEntries(
+    Object.entries(value)
+      .filter(([gameId]) => gameId.length > 0)
+      .map(([gameId, zoom]) => [gameId, isBoardZoomLevel(zoom) ? zoom : 1]),
+  );
+}
+
 export function parseSettings(value: unknown): Settings {
   if (!isRecord(value)) return DEFAULT_SETTINGS;
   const version = value.version;
@@ -320,6 +338,8 @@ export function parseSettings(value: unknown): Settings {
     version !== 2 &&
     version !== 3 &&
     version !== 4 &&
+    version !== 5 &&
+    version !== 6 &&
     version !== SETTINGS_VERSION
   ) {
     return DEFAULT_SETTINGS;
@@ -391,6 +411,10 @@ export function parseSettings(value: unknown): Settings {
       typeof value.showBoardCoordinates === 'boolean'
         ? value.showBoardCoordinates
         : DEFAULT_SETTINGS.showBoardCoordinates,
+    useWesternSymbols:
+      typeof value.useWesternSymbols === 'boolean'
+        ? value.useWesternSymbols
+        : DEFAULT_SETTINGS.useWesternSymbols,
     confirmMove:
       typeof value.confirmMove === 'boolean' ? value.confirmMove : DEFAULT_SETTINGS.confirmMove,
     autoFlipBoard:
@@ -444,7 +468,12 @@ export function parseSettings(value: unknown): Settings {
     graphicsQuality: isOneOf(value.graphicsQuality, ['high', 'medium', 'battery-saver'])
       ? value.graphicsQuality
       : DEFAULT_SETTINGS.graphicsQuality,
-    gameSettings: version === SETTINGS_VERSION ? parseGameSettingsMap(value.gameSettings) : {},
+    gameSettings:
+      typeof version === 'number' && version >= 5 ? parseGameSettingsMap(value.gameSettings) : {},
+    boardZoomLevels:
+      typeof version === 'number' && version >= 7
+        ? parseBoardZoomLevels(value.boardZoomLevels)
+        : {},
   };
 }
 
