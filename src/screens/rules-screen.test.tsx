@@ -41,24 +41,24 @@ describe('How to play rules', () => {
     expect(screen.queryByRole('heading', { name: 'Setup for connect-4' })).toBeNull();
   });
 
-  it('serves a direct rules URL and disables Play for a coming-soon game', () => {
+  it('serves a direct rules URL and keeps Play enabled for an available game', () => {
     renderRulesApp('/games/mancala/rules');
 
     expect(screen.getByRole('heading', { name: 'Mancala (Kalah) Rules', level: 1 })).toBeTruthy();
     expect(screen.getAllByText(/extra turn/i).length).toBeGreaterThan(0);
     const playButton = screen.getByRole('button', { name: /Play/ }) as HTMLButtonElement;
-    expect(playButton.disabled).toBe(true);
-    expect(playButton.textContent).toContain('Coming soon');
+    expect(playButton.disabled).toBe(false);
+    expect(playButton.textContent).not.toContain('Coming soon');
   });
 
-  it('opens the rules in advance from a coming-soon game card', async () => {
+  it('opens the rules in advance from an available game card', async () => {
     const user = userEvent.setup();
     renderRulesApp();
 
     await user.click(screen.getByRole('button', { name: 'How to play Minesweeper' }));
 
     expect(screen.getByRole('heading', { name: 'Minesweeper Rules', level: 1 })).toBeTruthy();
-    expect((screen.getByRole('button', { name: /Play/ }) as HTMLButtonElement).disabled).toBe(true);
+    expect((screen.getByRole('button', { name: /Play/ }) as HTMLButtonElement).disabled).toBe(false);
   });
 
   it('renders readable rule sections at a 360px viewport', () => {

@@ -9,6 +9,7 @@ export const nations = [
   { id: 'italy', name: 'Italy', flag: '🇮🇹' },
   { id: 'spain', name: 'Spain', flag: '🇪🇸' },
   { id: 'portugal', name: 'Portugal', flag: '🇵🇹' },
+  { id: 'holland', name: 'Holland', flag: '🇳🇱' },
   { id: 'china', name: 'China', flag: '🇨🇳' },
   { id: 'india', name: 'India', flag: '🇮🇳' },
 ] as const;

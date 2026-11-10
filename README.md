@@ -62,9 +62,30 @@ arcade and local game features work without those optional values.
 
 ### Important note
 
+> The prompt-driven implementation work is treated as effectively complete for the current branch, while the longer-term roadmap phases remain intentionally paused and should not be re-opened unless explicitly requested.
+
 > The full end-to-end test work is still marked as pending and must be completed later. Do not assume the project is fully validated until that checklist is complete.
 
 > Current local unit coverage is green, but the broader QA and deployment checklist still needs follow-up in the target environment.
+
+## Holland prompt checklist
+
+This section captures the Holland-specific prompt tasks from the attached game and rules PDFs and keeps them tracking alongside the paused roadmap phases.
+
+- [x] Add Holland to the nations list and settings selector.
+- [x] Review the Dutch classics set and map each title to the app's existing game patterns.
+- [x] Implement Stratego in the app's UI and rules flow.
+- [x] Implement Sjoelen (Dutch shuffleboard) with a matching board interaction and scoring flow.
+- [ ] Implement Ganzenbord (The Game of the Goose) with the goose bonuses and landing rules.
+- [ ] Implement Mens Erger Je Niet with the race-and-capture loop and safe-zone logic.
+- [ ] Implement Trictrac (Dutch Backgammon variant) with the board, move rules, and bearing-off flow.
+- [ ] Implement Levensweg (The Game of Life - Dutch Edition) using the app's board-game conventions.
+- [ ] Implement Dammen (Dutch draughts / international checkers) with mandatory captures and win detection.
+- [ ] Implement Keezenspel (Keezen) using the card-driven race mechanic.
+- [ ] Implement Pim Pam Pet with the themed trivia card interaction and scoring system.
+- [ ] Implement Dutch Blitz with the rapid simultaneous card-laying UI and win conditions.
+- [ ] Align each Holland game with the current application styling, controls, settings, and nation filtering.
+- [ ] Validate each game against the arcade's accessibility, routing, and smoke-test expectations.
 
 ## Roadmap checklist
 

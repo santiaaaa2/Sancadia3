@@ -6,6 +6,8 @@ export type RulesGameId =
   | 'gomoku'
   | 'reversi'
   | 'latrunculi'
+  | 'stratego'
+  | 'sjoelen'
   | 'checkers'
   | 'battleships'
   | 'mastermind'
@@ -181,6 +183,62 @@ export const rulesContent = {
       'Keep stones near one another so they can support captures.',
       'Watch for enemy stones that can become trapped between two of yours.',
       'An empty route can be as valuable as an immediate capture.',
+    ],
+  },
+  stratego: {
+    title: 'Stratego',
+    goal: 'Capture the enemy flag while protecting your own army and its hidden strengths.',
+    setup:
+      'Each player arranges a 10-by-10 battle board with a hidden army of 40 pieces, including scouts, miners, spies, bombs, and a flag. The board starts with each side’s pieces tucked into their own camp.',
+    howToPlay: [
+      'Take turns moving one piece orthogonally by one square, or move a scout in a straight line through empty spaces.',
+      'If you move into an enemy piece, both ranks are revealed; the stronger piece survives and the loser is removed.',
+      'A miner defeats a bomb, a spy beats the marshal only when attacking, and a bomb or flag cannot move.',
+      'Win by capturing the opposing flag or leaving your opponent without any moveable pieces.',
+    ],
+    winning:
+      'A player wins when they capture the enemy flag or reduce the enemy to no moveable pieces. A drawn board is uncommon in a standard match but can be reported if neither side can advance to a legal win.',
+    specialRules: [
+      'A scout may continue through empty squares in a straight line until blocked by another piece or the board edge.',
+      'When ranks tie, both pieces are removed from the board.',
+      'The flag and bomb are immobile and must be guarded from enemy attacks.',
+    ],
+    difficultyNotes: {
+      beginner: 'Keep your flag away from the front line and look for safe, supporting flips around enemy scouts.',
+      professional: 'Blend forward pressure with quiet protection so the flag is never left exposed.',
+      expert: 'Track hidden piece positions and attack patterns, then use your strongest pieces to force the enemy flag into the open.',
+    },
+    tips: [
+      'Early scouts are good at probing the enemy without committing your heavier troops.',
+      'A miner cannot help if you leave your bomb line weak or your flag too close to the attack lane.',
+    ],
+  },
+  sjoelen: {
+    title: 'Sjoelen',
+    goal: 'Score as many points as possible across three rounds by landing discs in the highest-value lanes.',
+    setup:
+      'The board has four scoring lanes with values 2, 3, 4, and 1. You throw 30 discs in each round, aiming to collect as many points as possible before the round ends.',
+    howToPlay: [
+      'Choose one lane to aim at for each throw.',
+      'Each disc lands in a lane and adds to that lane’s count.',
+      'The round ends after all 30 discs have been thrown.',
+      'Use your total across the three rounds to set your best score.',
+    ],
+    winning:
+      'The game is scored by total points across all three rounds. A full set of discs in every lane grants an extra 20-point bonus.',
+    specialRules: [
+      'Each lane has a different point value: 2, 3, 4, and 1 points respectively.',
+      'A wave of 30 discs per round gives a natural challenge even when the aim is imperfect.',
+      'A complete set in all four lanes adds a 20-point round bonus.',
+    ],
+    difficultyNotes: {
+      beginner: 'Start by aiming for the middle, high-value lanes to build steady points.',
+      professional: 'Balance the 4-point lane with the 2- and 3-point lanes to avoid empty slots.',
+      expert: 'Track the lane totals and chase the bonus by filling every lane before the round closes.',
+    },
+    tips: [
+      'A full set of lanes is worth more than a lucky spike in one category.',
+      'The 4-point lane is valuable, but the set bonus matters if every lane is active.',
     ],
   },
   battleships: {
