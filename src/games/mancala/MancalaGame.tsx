@@ -21,8 +21,12 @@ export default function MancalaGame() {
   return (
     <div className="flex flex-1 flex-col gap-4">
       <Card className="text-center">
-        <p role="status" aria-live="polite" className="font-semibold">{game.message}</p>
-        <p className="mt-1 text-sm text-subtle">Land your last stone in your store for another turn.</p>
+        <p role="status" aria-live="polite" className="font-semibold">
+          {game.message}
+        </p>
+        <p className="mt-1 text-sm text-subtle">
+          Land your last stone in your store for another turn.
+        </p>
       </Card>
       <Card className="mx-auto w-full max-w-xl">
         <div className="grid grid-cols-[3.5rem_1fr_3.5rem] items-center gap-2 sm:grid-cols-[4.5rem_1fr_4.5rem]">
@@ -42,10 +46,15 @@ export default function MancalaGame() {
       </Card>
       {game.over && (
         <Card role="status" className="text-center font-bold">
-          {game.stores[0] === game.stores[1] ? 'Draw game!' : `Player ${game.stores[0] > game.stores[1] ? 1 : 2} wins!`}
+          {game.stores[0] === game.stores[1]
+            ? 'Draw game!'
+            : `Player ${game.stores[0] > game.stores[1] ? 1 : 2} wins!`}
         </Card>
       )}
-      <Button variant="secondary" onClick={game.restart}><RotateCcw className="h-4 w-4" aria-hidden="true" />New game</Button>
+      <Button variant="secondary" onClick={game.restart}>
+        <RotateCcw className="h-4 w-4" aria-hidden="true" />
+        New game
+      </Button>
     </div>
   );
 }

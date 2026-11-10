@@ -10,7 +10,14 @@ interface MancalaState {
 }
 
 function createGame(): MancalaState {
-  return { pits: [Array(6).fill(4), Array(6).fill(4)], stores: [0, 0], player: 0, over: false, lastSown: null, message: 'Player 1’s turn.' };
+  return {
+    pits: [Array(6).fill(4), Array(6).fill(4)],
+    stores: [0, 0],
+    player: 0,
+    over: false,
+    lastSown: null,
+    message: 'Player 1’s turn.',
+  };
 }
 
 export function useMancala() {
@@ -26,7 +33,8 @@ export function useMancala() {
       let lastSown: MancalaState['lastSown'] = null;
       while (stones > 0) {
         position = (position + (state.player === 0 ? 1 : 13)) % 14;
-        if ((state.player === 0 && position === 13) || (state.player === 1 && position === 6)) continue;
+        if ((state.player === 0 && position === 13) || (state.player === 1 && position === 6))
+          continue;
         stones--;
         if (position === 6 || position === 13) {
           const owner = position === 6 ? 0 : 1;
@@ -51,8 +59,11 @@ export function useMancala() {
         }
       }
 
-      const sideEmpty = pits.map((side) => side.every((count) => count === 0));
-      const over = sideEmpty[0] || sideEmpty[1];
+      const sideEmpty: [boolean, boolean] = [
+        pits[0].every((count) => count === 0),
+        pits[1].every((count) => count === 0),
+      ];
+      const over: boolean = sideEmpty[0] || sideEmpty[1];
       if (over) {
         for (const side of [0, 1] as const) {
           stores[side] += pits[side].reduce((sum, count) => sum + count, 0);
@@ -60,14 +71,18 @@ export function useMancala() {
         }
       }
       const landedInStore = state.player === 0 ? position === 6 : position === 13;
-      const player = over || landedInStore ? state.player : (state.player === 0 ? 1 : 0);
+      const player = over || landedInStore ? state.player : state.player === 0 ? 1 : 0;
       return {
         pits,
         stores,
         over,
         lastSown,
         player,
-        message: over ? 'The game is over.' : landedInStore ? `Player ${state.player + 1} gets another turn.` : `Player ${player + 1}’s turn.`,
+        message: over
+          ? 'The game is over.'
+          : landedInStore
+            ? `Player ${state.player + 1} gets another turn.`
+            : `Player ${player + 1}’s turn.`,
       };
     });
   }, []);

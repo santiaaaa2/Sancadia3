@@ -154,6 +154,6 @@ describe('LATRUNCULI game flow', () => {
     expect(screen.getByRole('button', { name: /A7 square/ })).toHaveProperty('disabled', true);
     expect(screen.getByRole('button', { name: 'Resign' })).toHaveProperty('disabled', true);
     expect(screen.getByRole('button', { name: 'New game' })).toBeTruthy();
-    expect(screen.getByRole('button', { name: 'Main menu' })).toBeTruthy();
+    expect(screen.getAllByRole('button', { name: 'Main menu' })).toHaveLength(2);
   });
 });

@@ -217,7 +217,9 @@ export default function LatrunculiMatch({
               aria-hidden="true"
             />
             <div className="min-w-0 flex-1">
-              <p className="font-bold">{statusText(result, turn, config, humanSide)}</p>
+              <p className="font-bold" role="status" aria-live="polite">
+                {statusText(result, turn, config, humanSide)}
+              </p>
               <p className="text-xs">
                 Active army: {armyTitle(turn)} · {armyName(turn, config, humanSide)}
               </p>

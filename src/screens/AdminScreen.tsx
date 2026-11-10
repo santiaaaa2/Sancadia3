@@ -40,7 +40,7 @@ function number(value: number | null | undefined): string {
 
 function money(amount: number, currency: string): string {
   const formatter = new Intl.NumberFormat(undefined, { style: 'currency', currency });
-  const fractionDigits = formatter.resolvedOptions().maximumFractionDigits;
+  const fractionDigits = formatter.resolvedOptions().maximumFractionDigits ?? 2;
   return formatter.format(amount / 10 ** fractionDigits);
 }
 

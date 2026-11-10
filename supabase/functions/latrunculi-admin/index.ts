@@ -57,9 +57,7 @@ function parseContent(value: unknown): Omit<AdminContent, 'created_at' | 'update
   if (
     (id !== undefined &&
       (typeof id !== 'string' ||
-        !/^[0-9a-f]{8}-[0-9a-f]{4}-[1-8][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(
-          id,
-        ))) ||
+        !/^[0-9a-f]{8}-[0-9a-f]{4}-[1-8][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(id))) ||
     typeof content_type !== 'string' ||
     !CONTENT_TYPES.includes(content_type as ContentType) ||
     typeof slug !== 'string' ||
@@ -319,9 +317,7 @@ async function handle(request: Request, admin: SupabaseClient, origin: string | 
   if (body.action === 'delete_content') {
     if (
       typeof body.id !== 'string' ||
-      !/^[0-9a-f]{8}-[0-9a-f]{4}-[1-8][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(
-        body.id,
-      )
+      !/^[0-9a-f]{8}-[0-9a-f]{4}-[1-8][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(body.id)
     ) {
       return response({ error: 'Invalid content id.' }, 400, origin);
     }

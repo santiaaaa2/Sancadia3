@@ -4,7 +4,7 @@
   "features": {
     "ghcr.io/devcontainers/features/docker-in-docker:2": {}
   },
-  "forwardPorts":,
+  "forwardPorts": [5173, 54321],
   "postCreateCommand": "npm ci",
   "customizations": {
     "vscode": {

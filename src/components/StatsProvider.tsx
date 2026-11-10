@@ -32,8 +32,8 @@ export default function StatsProvider({ children }: { children: ReactNode }) {
     setStats(recorded.stats);
 
     if (supabase) {
-      void supabase
-        .rpc('submit_result', {
+      void Promise.resolve(
+        supabase.rpc('submit_result', {
           p_client_result_id: crypto.randomUUID(),
           p_game_id: result.gameId,
           p_difficulty: result.difficulty ?? 'beginner',
@@ -41,7 +41,8 @@ export default function StatsProvider({ children }: { children: ReactNode }) {
           p_match_mode: result.mode,
           p_attempts: result.attempts ?? null,
           p_hints_used: result.hintsUsed ?? 0,
-        })
+        }),
+      )
         .then(({ error }) => {
           if (error) console.error('Unable to sync game result with Supabase:', error);
         })

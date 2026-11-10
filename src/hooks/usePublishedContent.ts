@@ -26,12 +26,14 @@ export function usePublishedContent(types: readonly AdminContentType[]) {
       return;
     }
 
-    void client
-      .from('admin_content')
-      .select('id, content_type, slug, title, description, payload')
-      .in('content_type', typeKey.split(',') as AdminContentType[])
-      .eq('status', 'published')
-      .order('updated_at', { ascending: false })
+    void Promise.resolve(
+      client
+        .from('admin_content')
+        .select('id, content_type, slug, title, description, payload')
+        .in('content_type', typeKey.split(',') as AdminContentType[])
+        .eq('status', 'published')
+        .order('updated_at', { ascending: false }),
+    )
       .then(({ data, error: queryError }) => {
         if (!active) return;
         if (queryError) {

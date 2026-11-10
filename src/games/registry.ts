@@ -227,7 +227,7 @@ export const games: GameInfo[] = [
     minPlayers: 1,
     maxPlayers: 1,
     icon: '💣',
-    status: 'coming-soon',
+    status: 'available',
     type: 'puzzle',
     capabilities: PUZZLE_CAPABILITIES,
   },

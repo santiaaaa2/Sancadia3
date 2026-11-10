@@ -33,9 +33,7 @@ function createGame(): DominoesState {
 
 function canPlay(tile: Domino, line: Domino[], side: DominoSide): boolean {
   if (!line.length) return true;
-  return side === 'left'
-    ? tile.includes(line[0]![0])
-    : tile.includes(line[line.length - 1]![1]);
+  return side === 'left' ? tile.includes(line[0]![0]) : tile.includes(line[line.length - 1]![1]);
 }
 
 function placeTile(state: DominoesState, index: number, side: DominoSide): DominoesState {
@@ -65,11 +63,29 @@ function placeTile(state: DominoesState, index: number, side: DominoSide): Domin
 function finishTurn(state: DominoesState, player: 0 | 1, message: string): DominoesState {
   const emptyHand = state.hands.findIndex((hand) => hand.length === 0);
   if (emptyHand !== -1) {
-    return { ...state, winner: emptyHand as 0 | 1, message: emptyHand === 0 ? 'You win!' : 'The computer wins.' };
+    return {
+      ...state,
+      winner: emptyHand as 0 | 1,
+      message: emptyHand === 0 ? 'You win!' : 'The computer wins.',
+    };
   }
-  if (state.boneyard.length === 0 && state.hands.every((hand) => !hand.some((tile) => canPlay(tile, state.line, 'left') || canPlay(tile, state.line, 'right')))) {
-    const totals = state.hands.map((hand) => hand.reduce((sum, tile) => sum + tile[0] + tile[1], 0));
-    return { ...state, winner: totals[0] === totals[1] ? 'draw' : totals[0]! < totals[1]! ? 0 : 1, message: 'No more moves. The lower pip count wins.' };
+  if (
+    state.boneyard.length === 0 &&
+    state.hands.every(
+      (hand) =>
+        !hand.some(
+          (tile) => canPlay(tile, state.line, 'left') || canPlay(tile, state.line, 'right'),
+        ),
+    )
+  ) {
+    const totals = state.hands.map((hand) =>
+      hand.reduce((sum, tile) => sum + tile[0] + tile[1], 0),
+    );
+    return {
+      ...state,
+      winner: totals[0] === totals[1] ? 'draw' : totals[0]! < totals[1]! ? 0 : 1,
+      message: 'No more moves. The lower pip count wins.',
+    };
   }
   const next = (player === 0 ? 1 : 0) as 0 | 1;
   return { ...state, player: next, message: next === 0 ? message : 'Computer is thinking…' };
@@ -102,11 +118,14 @@ export function useDominoes() {
         if (state.player !== 1 || state.winner !== null) return state;
         const options = state.hands[1]
           .map((tile, index) => ({ tile, index }))
-          .filter(({ tile }) => canPlay(tile, state.line, 'left') || canPlay(tile, state.line, 'right'))
+          .filter(
+            ({ tile }) => canPlay(tile, state.line, 'left') || canPlay(tile, state.line, 'right'),
+          )
           .sort((a, b) => b.tile[0] + b.tile[1] - a.tile[0] - a.tile[1]);
         if (options.length) {
           const { tile, index } = options[0]!;
-          const side: DominoSide = state.line.length && tile.includes(state.line[0]![0]) ? 'left' : 'right';
+          const side: DominoSide =
+            state.line.length && tile.includes(state.line[0]![0]) ? 'left' : 'right';
           const line = [...state.line];
           if (!line.length) line.push(tile);
           else if (side === 'left') {

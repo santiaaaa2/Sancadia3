@@ -32,29 +32,39 @@ arcade and local game features work without those optional values.
 
 ## Project status
 
-> Roadmap status last updated November 7, 2026 at 4:26 a.m. UTC.
+> Roadmap status last updated November 10, 2026.
+
+### Recent implementation highlights
+
+- Expanded the arcade to a full game catalog with board-game entries such as Latrunculi, Reversi, Checkers, Dots and Boxes, Mancala, Dominoes, Ludo, Snake and 2048.
+- Added a global settings flow with persistent preferences, nation/theme selection, accessibility controls, PWA install actions, and reset-data tooling.
+- Completed a full Latrunculi gameplay loop with local pass-and-play, computer AI, undo, resign handling, and move recording.
+- Added run-of-show docs for settings compliance and the Latrunculi admin dashboard, including Supabase edge-function deployment guidance.
+- Continued the Supabase work with migrations and admin/metrics support around profiles, game results, and published admin content.
 
 ### What has been done
 
 - Set up the Vite + React + TypeScript arcade structure.
 - Added/updated authentication context and session handling.
-- Added game registry entries and puzzle game support.
+- Added game registry entries and puzzle/versus game support across the arcade.
 - Fixed the codebreaker RNG generation bug that could stall unique-secret generation.
 - Completed Phase 6: shared code-breaker gameplay, Mastermind, Bulls and Cows, Hangman, pass-and-play, keyboard and notes UX, puzzle points/stats, and documentation.
-- Verified `npm run check` (19 test files, 124 tests) and `npm run build`.
+- Delivered key Phase 7 board-game and settings work: global per-game settings, nation and theme selection, install/reset UX, and completed Latrunculi game flow and admin docs.
+- Verified `npm run check` and the focused Latrunculi test flow in the current branch.
 
 ### What still needs to be done
 
 - Complete any remaining browser-level/manual QA checks after deployment or local preview.
-- Confirm end-to-end flow for authentication, save data, and game sessions in a live environment.
+- Confirm the end-to-end flow for authentication, save data, and game sessions in a live environment.
 - Review remaining UX polish and accessibility items before release.
+- Finish the remaining Supabase/Cloudflare backend security and deployment items.
 - Finish any outstanding production or PWA validation tasks.
 
 ### Important note
 
 > The full end-to-end test work is still marked as pending and must be completed later. Do not assume the project is fully validated until that checklist is complete.
 
-> Current local unit coverage is green, but the broader test/QA checklist still needs follow-up in the target environment.
+> Current local unit coverage is green, but the broader QA and deployment checklist still needs follow-up in the target environment.
 
 ## Roadmap checklist
 
@@ -68,9 +78,12 @@ This roadmap is derived from the build-plan PDFs and the prompt sequence for the
 - [x] Hangman
 - [x] Stats, points and docs
 
-### Phase 7 — Supabase
+### Phase 7 — Supabase and game systems
 
-- [ ] Supabase schema, RLS and score tables
+- [x] Supabase migration and admin dashboard scaffolding
+- [x] Game result and profile data flows for admin insights
+- [x] Global settings persistence and UI polish
+- [x] Latrunculi gameplay, AI and pass-device UX
 - [ ] Client and anonymous auth flow
 - [ ] Offline-first synced stats
 - [ ] Leaderboards
@@ -86,11 +99,12 @@ This roadmap is derived from the build-plan PDFs and the prompt sequence for the
 
 ### Phase 9 — Board game batch 2
 
-- [ ] Engine hardening and new-game scaffolding
-- [ ] Reversi
-- [ ] Checkers
-- [ ] Dots and Boxes
-- [ ] Mancala
+- [x] Reversi
+- [x] Checkers
+- [x] Dots and Boxes
+- [x] Mancala
+- [x] Ludo
+- [x] Latrunculi rules, AI and match flow
 - [ ] Batch integration and docs
 
 ### Phase 10 — Hidden-information and chance games
